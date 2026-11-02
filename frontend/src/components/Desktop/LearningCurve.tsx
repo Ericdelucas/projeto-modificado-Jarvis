@@ -261,14 +261,14 @@ export function LearningCurve({ apiUrl }: { apiUrl: string }) {
             <span style={styles.value}>{policyConfig?.name ?? 'unknown'}</span>
           </div>
           <div style={styles.row}>
-            <span style={styles.label}>Status</span>
+            <span style={styles.label}>Estado</span>
             <span
               style={{
                 ...styles.badge,
                 ...(policyConfig?.enabled ? styles.badgeEnabled : styles.badgeDisabled),
               }}
             >
-              {policyConfig?.enabled ? 'Enabled' : 'Disabled'}
+              {policyConfig?.enabled ? "Ativado" : "Desativado"}
             </span>
           </div>
           <div style={styles.row}>
@@ -378,7 +378,7 @@ export function LearningCurve({ apiUrl }: { apiUrl: string }) {
             <thead>
               <tr>
                 <th style={styles.th}>Query Class</th>
-                <th style={styles.th}>Model</th>
+                <th style={styles.th}>Modelo</th>
                 <th style={styles.th}>Weight</th>
               </tr>
             </thead>
@@ -412,7 +412,7 @@ export function LearningCurve({ apiUrl }: { apiUrl: string }) {
           <table style={styles.table}>
             <thead>
               <tr>
-                <th style={styles.th}>Model</th>
+                <th style={styles.th}>Modelo</th>
                 <th style={styles.th}>Pulls</th>
                 <th style={styles.th}>Mean Reward</th>
                 <th style={styles.th}>UCB</th>

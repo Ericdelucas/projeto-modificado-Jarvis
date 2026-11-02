@@ -41,6 +41,8 @@ const OPTIN_NAME_KEY = 'openjarvis-display-name';
 const OPTIN_EMAIL_KEY = 'openjarvis-email';
 const OPTIN_ANONID_KEY = 'openjarvis-anon-id';
 const OPTIN_SEEN_KEY = 'openjarvis-optin-seen';
+// Set once the HUD redesign has switched an existing install to dark.
+const HUD_THEME_KEY = 'openjarvis-hud-theme';
 
 interface ConversationStore {
   version: 1;
@@ -112,7 +114,7 @@ interface Settings {
 
 function loadSettings(): Settings {
   const defaults: Settings = {
-    theme: 'system',
+    theme: 'dark',
     apiUrl: '',
     apiKey: '',
     fontSize: 'default',
@@ -120,14 +122,21 @@ function loadSettings(): Settings {
     defaultAgent: '',
     temperature: 0.7,
     maxTokens: 4096,
-    speechEnabled: false,
-    voiceOutputEnabled: false,
-    voiceAutoplay: false,
+    speechEnabled: true,
+    voiceOutputEnabled: true,
+    voiceAutoplay: true,
   };
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return defaults;
-    return { ...defaults, ...JSON.parse(raw) };
+    const settings: Settings = raw ? { ...defaults, ...JSON.parse(raw) } : defaults;
+    // The HUD is designed dark: move older installs over once, after which
+    // the user's own theme choice sticks.
+    if (!localStorage.getItem(HUD_THEME_KEY)) {
+      localStorage.setItem(HUD_THEME_KEY, '1');
+      settings.theme = 'dark';
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    }
+    return settings;
   } catch {
     return defaults;
   }
@@ -273,11 +282,10 @@ export const useAppStore = create<AppState>((set, get) => {
 
   return {
     conversations: convList,
-    activeId: initial.activeId,
-    messages:
-      initial.activeId && initial.conversations[initial.activeId]
-        ? initial.conversations[initial.activeId].messages
-        : [],
+    // Every launch opens on the home screen with the core; past
+    // conversations stay one click away in the sidebar.
+    activeId: null,
+    messages: [],
     streamState: INITIAL_STREAM,
 
     models: [],
@@ -351,7 +359,7 @@ export const useAppStore = create<AppState>((set, get) => {
       const store = loadConversations();
       const conv: Conversation = {
         id: generateId(),
-        title: 'New chat',
+        title: 'Nova conversa',
         createdAt: Date.now(),
         updatedAt: Date.now(),
         model: model || get().selectedModel || 'default',
@@ -421,7 +429,7 @@ export const useAppStore = create<AppState>((set, get) => {
       if (!conv) return;
       conv.messages.push(message);
       conv.updatedAt = Date.now();
-      if (message.role === 'user' && conv.title === 'New chat') {
+      if (message.role === 'user' && (conv.title === 'Nova conversa' || conv.title === 'New chat')) {
         conv.title =
           message.content.slice(0, 50) +
           (message.content.length > 50 ? '...' : '');

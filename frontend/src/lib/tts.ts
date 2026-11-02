@@ -1,5 +1,7 @@
+import { prepareStreamingSpeech, type PreparedSpeech } from './streaming-speech';
 import { create } from 'zustand';
 import { synthesizeSpeech, fetchTtsHealth } from './api';
+import { cleanSpeechText } from './message-text';
 
 export type TtsState = 'idle' | 'loading' | 'speaking';
 
@@ -22,6 +24,7 @@ interface TtsStore {
   /** Last message spoken by autoplay, so a re-render never repeats it. */
   autoSpokenId: string | null;
   speak: (id: string, text: string) => Promise<void>;
+  enqueue: (id: string, text: string) => void;
   stop: () => void;
   ensureHealth: () => Promise<void>;
   markAutoSpoken: (id: string) => void;
@@ -33,6 +36,11 @@ let audio: HTMLAudioElement | null = null;
 let objectUrl: string | null = null;
 let controller: AbortController | null = null;
 let token = 0;
+let queue: Array<{ id: string; text: string; prepared?: Promise<PreparedSpeech> }> = [];
+let queueOwner: string | null = null;
+let queueBusy = false;
+let queueController = new AbortController();
+let queuedPlayback: PreparedSpeech | null = null;
 let healthProbe: Promise<void> | null = null;
 
 /** Only a stream ending in the active conversation may trigger autoplay. */
@@ -52,6 +60,13 @@ export function shouldAutoplayFinishedReply(
 }
 
 function teardown(): void {
+  queueController.abort();
+  queueController = new AbortController();
+  queue = [];
+  queueOwner = null;
+  queueBusy = false;
+  queuedPlayback?.dispose();
+  queuedPlayback = null;
   if (audio) {
     // Detach first: clearing src re-runs the media load algorithm, which fails
     // on an empty source and dispatches an `error` event. With the handler
@@ -95,10 +110,22 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
     return healthProbe;
   },
 
+  enqueue: (id, text) => {
+    const cleaned = cleanSpeechText(text);
+    if (!cleaned) return;
+    if (queueOwner !== id) {
+      get().stop();
+      queueOwner = id;
+    }
+    queue.push({ id, text: cleaned });
+    prefetchSpeech();
+    void drainSpeechQueue();
+  },
+
   markAutoSpoken: (id: string) => set({ autoSpokenId: id }),
 
   speak: async (id: string, text: string) => {
-    const trimmed = text.trim();
+    const trimmed = cleanSpeechText(text);
     if (!trimmed) return;
 
     // Bump before teardown so a synthesis still in flight is both aborted and
@@ -128,7 +155,7 @@ export const useTtsStore = create<TtsStore>((set, get) => ({
       el.onerror = () => {
         if (mine !== token) return;
         teardown();
-        set({ state: 'idle', speakingId: null, error: 'Playback failed', errorId: id });
+        set({ state: 'idle', speakingId: null, error: 'Não foi possível reproduzir o áudio', errorId: id });
       };
 
       await el.play();
@@ -166,4 +193,51 @@ export function __resetTtsForTests(): void {
     available: null,
     autoSpokenId: null,
   });
+}
+
+
+/** Synthesis prefetches subsequent phrases; playback remains strictly ordered. */
+async function drainSpeechQueue(): Promise<void> {
+  if (queueBusy || !queue.length) return;
+  queueBusy = true;
+  const mine = token;
+  const item = queue.shift()!;
+  useTtsStore.setState({ state: 'loading', speakingId: item.id, error: null, errorId: null });
+  try {
+    prefetchSpeech();
+    const clip = await item.prepared!;
+    if (mine !== token) { clip.dispose(); return; }
+    queuedPlayback = clip;
+    const finish = () => {
+      if (mine !== token) return;
+      clip.dispose();
+      queuedPlayback = null;
+      queueBusy = false;
+      useTtsStore.setState({ state: 'idle', speakingId: null });
+      void drainSpeechQueue();
+    };
+    clip.audio.onended = finish;
+    clip.audio.onerror = () => {
+      if (mine !== token) return;
+      useTtsStore.getState().stop();
+      useTtsStore.setState({ error: 'Não foi possível reproduzir a voz neural.', errorId: item.id });
+    };
+    await clip.audio.play();
+    if (mine === token) useTtsStore.setState({ state: 'speaking', speakingId: item.id });
+  } catch (error) {
+    if (mine !== token) return;
+    useTtsStore.getState().stop();
+    useTtsStore.setState({ error: error instanceof Error ? error.message : 'Falha na voz neural.', errorId: item.id });
+  }
+}
+
+export function speechGeneration(): number { return token; }
+
+
+/** Only the next phrase preloads, limiting remote requests and memory use. */
+function prefetchSpeech(): void {
+  const next = queue[0];
+  if (!next || next.prepared) return;
+  next.prepared = prepareStreamingSpeech(next.text, queueController.signal);
+  void next.prepared.catch(() => {});
 }

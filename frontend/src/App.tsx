@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Routes, Route } from 'react-router';
 import { Layout } from './components/Layout';
-import { ChatPage } from './pages/ChatPage';
+import { JarvisHudPage } from './pages/JarvisHudPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GetStartedPage } from './pages/GetStartedPage';
@@ -35,7 +35,6 @@ export default function App() {
   const selectedModel = useAppStore((s) => s.selectedModel);
   const setServerInfo = useAppStore((s) => s.setServerInfo);
   const setSavings = useAppStore((s) => s.setSavings);
-  const settings = useAppStore((s) => s.settings);
   const commandPaletteOpen = useAppStore((s) => s.commandPaletteOpen);
   const setCommandPaletteOpen = useAppStore((s) => s.setCommandPaletteOpen);
   const optInEnabled = useAppStore((s) => s.optInEnabled);
@@ -52,9 +51,8 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('dark', 'light');
-    if (settings.theme === 'dark') root.classList.add('dark');
-    else if (settings.theme === 'light') root.classList.add('light');
-  }, [settings.theme]);
+    root.classList.add('dark');
+  }, []);
 
   // Sync overlay conversations into the main app
   const importOverlay = useAppStore((s) => s.importOverlayConversation);
@@ -120,7 +118,7 @@ export default function App() {
 
   // Wait for desktop setup before fetching identity or marking the dialog seen.
   useEffect(() => offerAnalyticsChoice({
-    ready: setupDone,
+    ready: setupDone && isTauri(),
     sharingModalSeen: optInModalSeen,
     open: () => setOptInModalOpen(true),
     markSharingModalSeen: markOptInModalSeen,
@@ -184,7 +182,7 @@ export default function App() {
       <UpdateChecker />
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<ChatPage />} />
+          <Route index element={<JarvisHudPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="get-started" element={<GetStartedPage />} />

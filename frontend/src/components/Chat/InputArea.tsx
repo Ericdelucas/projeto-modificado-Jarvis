@@ -1,3 +1,8 @@
+import { useWakeWord } from '../../hooks/useWakeWord';
+import { activationBeep, useWakeWordStore, wakeClientId } from '../../lib/wakeword';
+import { ReplySpeech } from '../../lib/reply-speech';
+import { useTtsStore } from '../../lib/tts';
+import { useInteractionMode } from '../../lib/interaction-mode';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send, Square, Paperclip, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -89,7 +94,8 @@ export function InputArea() {
   const selectedModel = useAppStore((s) => s.selectedModel);
   const streamState = useAppStore((s) => s.streamState);
   const messages = useAppStore((s) => s.messages);
-  const speechEnabled = useAppStore((s) => s.settings.speechEnabled);
+  const mode = useInteractionMode((s) => s.mode);
+  const speechEnabled = mode === 'voice';
   const maxTokens = useAppStore((s) => s.settings.maxTokens);
   const temperature = useAppStore((s) => s.settings.temperature);
   const createConversation = useAppStore((s) => s.createConversation);
@@ -103,13 +109,61 @@ export function InputArea() {
   const corpusSync = useResearchCorpusSync(deepResearch);
   const isCurrentChatStreaming = streamState.isStreaming && streamState.conversationId === activeId;
 
+  const wakeRecordingRef = useRef(false);
+  const wakeTranscriptRef = useRef<string | null>(null);
   const {
     state: speechState,
     error: speechError,
     available: speechAvailable,
     startRecording,
     stopRecording,
-  } = useSpeech();
+    cancelRecording,
+  } = useSpeech((text) => {
+    if (useInteractionMode.getState().mode === 'voice' && text) {
+      if (wakeRecordingRef.current) {
+        wakeTranscriptRef.current = text;
+        setInput(text);
+      } else setInput((prev) => (prev ? prev + ' ' + text : text));
+    }
+    wakeRecordingRef.current = false;
+  });
+
+  useEffect(() => {
+    if (mode !== 'voice') {
+      wakeRecordingRef.current = false;
+      wakeTranscriptRef.current = null;
+      cancelRecording();
+    }
+  }, [mode, cancelRecording]);
+
+  const ttsState = useTtsStore((s) => s.state);
+  useWakeWord(async () => {
+    if (useInteractionMode.getState().mode !== 'voice' || speechState !== 'idle'
+      || streamState.isStreaming || modelLoading || useTtsStore.getState().state !== 'idle') {
+      console.info('[wakeword] Ativação ignorada: interface ocupada ou fora do Modo Voz', {
+        speechState, streaming: streamState.isStreaming, modelLoading, tts: useTtsStore.getState().state,
+      });
+      return;
+    }
+    if (!speechAvailable) {
+      console.warn('[wakeword] Gravador bloqueado: Whisper indisponível');
+      toast.error('A transcrição de voz não está disponível.');
+      return;
+    }
+    useTtsStore.getState().stop();
+    await activationBeep();
+    const wake = useWakeWordStore.getState();
+    if (useInteractionMode.getState().mode === 'voice' && wake.desiredEnabled !== false
+      && wake.status.enabled && wake.status.owner_id === wakeClientId) {
+      console.info('[wakeword] Iniciando gravador do navegador');
+      wakeRecordingRef.current = true;
+      await startRecording();
+    }
+  }, speechState !== 'idle' || streamState.isStreaming || modelLoading || ttsState !== 'idle',
+    speechState === 'recording',
+    speechState === 'recording' ? 'gravando' : speechState === 'transcribing' ? 'transcrevendo'
+      : streamState.isStreaming ? 'gerando' : modelLoading ? 'modelo' : ttsState !== 'idle' ? 'tts' : undefined, cancelRecording);
+
 
   // Abort in-flight stream when the user switches models mid-generation.
   // This prevents errors from trying to continue a stream with a stale model.
@@ -127,6 +181,8 @@ export function InputArea() {
     prevModelRef.current = selectedModel;
   }, [selectedModel, streamState.isStreaming, resetStream]);
 
+  useEffect(() => () => useTtsStore.getState().stop(), [activeId]);
+
   const micDisabled = !speechEnabled || !speechAvailable || streamState.isStreaming;
   const micReason: 'not-enabled' | 'no-backend' | 'streaming' | undefined =
     !speechEnabled ? 'not-enabled'
@@ -141,12 +197,12 @@ export function InputArea() {
   }, [speechError]);
 
   const handleMicClick = useCallback(async () => {
+    wakeRecordingRef.current = false;
+    wakeTranscriptRef.current = null;
+    useTtsStore.getState().stop();
     if (speechState === 'recording') {
       try {
-        const text = await stopRecording();
-        if (text) {
-          setInput((prev) => (prev ? prev + ' ' + text : text));
-        }
+        await stopRecording();
       } catch {
         // Error is captured in useSpeech
       }
@@ -163,6 +219,7 @@ export function InputArea() {
   }, [input]);
 
   const stopStreaming = useCallback(() => {
+    useTtsStore.getState().stop();
     abortRef.current?.abort();
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -175,10 +232,11 @@ export function InputArea() {
     const content = input.trim();
     if (!content || streamState.isStreaming) return;
     if (!selectedModel) {
-      toast.error('Pick a model first (⌘K)');
+      toast.error("Selecione um modelo primeiro (⌘K)");
       return;
     }
 
+    useTtsStore.getState().stop();
     setInput('');
 
     let convId = activeId;
@@ -220,10 +278,13 @@ export function InputArea() {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const replySpeech = new ReplySpeech(convId, assistantMsg.id);
     let accumulatedContent = '';
+    let completedSuccessfully = false;
     let usage: TokenUsage | undefined;
     let complexity: { score: number; tier: string; suggested_max_tokens: number } | undefined;
     let routedEngine: string | undefined;
+    let routedModel: string | undefined;
     const toolCalls: ToolCallInfo[] = [];
     const researchTraces: ResearchSearchTrace[] = [];
     const researchSourcesByRef = new Map<number, ResearchSource>();
@@ -235,7 +296,7 @@ export function InputArea() {
     setStreamState({
       conversationId: convId,
       isStreaming: true,
-      phase: deepResearch ? 'Researching...' : 'Generating...',
+      phase: deepResearch ? 'Researching...' : "Gerando...",
       elapsedMs: 0,
       activeToolCalls: [],
       content: '',
@@ -309,6 +370,7 @@ export function InputArea() {
           } else if (ev.type === 'synthesis') {
             if (!ttftMs) ttftMs = Date.now() - startTime;
             accumulatedContent += ev.text;
+            replySpeech.push(ev.text);
             setStreamState({ content: accumulatedContent, phase: '' });
             const now = Date.now();
             if (now - lastFlush >= 80) {
@@ -384,7 +446,7 @@ export function InputArea() {
         if (eventName === 'agent_turn_start') {
           setStreamState({ phase: 'Agent thinking...' });
         } else if (eventName === 'inference_start') {
-          setStreamState({ phase: 'Generating...' });
+          setStreamState({ phase: "Gerando..." });
           useAppStore.getState().addLogEntry({
             timestamp: Date.now(), level: 'info', category: 'chat',
             message: `Generating with ${selectedModel}...`,
@@ -421,7 +483,7 @@ export function InputArea() {
               tc.result = data.result;
             }
             setStreamState({
-              phase: 'Generating...',
+              phase: "Gerando...",
               activeToolCalls: [...toolCalls],
             });
             updateLastAssistant(convId, accumulatedContent, [...toolCalls]);
@@ -433,9 +495,11 @@ export function InputArea() {
             if (data.usage) usage = data.usage;
             if (data.complexity) complexity = data.complexity;
             routedEngine = engineFromCompletionChunk(data) ?? routedEngine;
+            if (typeof data.model === 'string' && data.model) routedModel = data.model;
             if (delta?.content) {
               if (!ttftMs) ttftMs = Date.now() - startTime;
               accumulatedContent += delta.content;
+              replySpeech.push(delta.content);
               setStreamState({ content: accumulatedContent, phase: '' });
 
               const now = Date.now();
@@ -453,7 +517,12 @@ export function InputArea() {
         }
       }
       }
+      completedSuccessfully = !controller.signal.aborted;
+      // Flush only the unfinished phrase; earlier phrases are already playing.
+      if (completedSuccessfully) replySpeech.finish();
+      else replySpeech.cancel();
     } catch (err: any) {
+      replySpeech.cancel();
       if (err.name === 'AbortError') {
         // User cancelled or model switch — keep whatever was accumulated
         if (!accumulatedContent) accumulatedContent = '(Generation stopped)';
@@ -475,16 +544,17 @@ export function InputArea() {
       }
       const totalMs = Date.now() - startTime;
       const appState = useAppStore.getState();
-      const selectedOwner = appState.models.find((m) => m.id === selectedModel)?.owned_by;
+      const actualModel = routedModel ?? selectedModel;
+      const selectedOwner = appState.models.find((m) => m.id === actualModel)?.owned_by;
       const engineLabel = resolveChatEngine({
         routedEngine,
         serverEngine: appState.serverInfo?.engine,
-        selectedModel,
+        selectedModel: actualModel,
         selectedOwner,
       });
       const telemetry: MessageTelemetry = {
         engine: engineLabel,
-        model_id: selectedModel,
+        model_id: actualModel,
         total_ms: totalMs,
         ttft_ms: ttftMs,
         tokens_per_sec: usage?.completion_tokens
@@ -554,6 +624,17 @@ export function InputArea() {
     maxTokens,
   ]);
 
+  useEffect(() => {
+    if (wakeTranscriptRef.current === null || speechState !== 'idle') return;
+    if (mode !== 'voice' || useWakeWordStore.getState().desiredEnabled === false) {
+      wakeTranscriptRef.current = null;
+      return;
+    }
+    if (input !== wakeTranscriptRef.current || streamState.isStreaming || modelLoading || !selectedModel) return;
+    wakeTranscriptRef.current = null;
+    void sendMessage();
+  }, [input, speechState, mode, streamState.isStreaming, modelLoading, selectedModel, sendMessage]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -576,10 +657,10 @@ export function InputArea() {
               border: `1px solid ${deepResearch ? 'var(--color-accent)' : 'var(--color-border)'}`,
               color: deepResearch ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
             }}
-            title={deepResearch ? 'Deep Research: on' : 'Deep Research: off'}
+            title={deepResearch ? "Pesquisa aprofundada: ativada" : "Pesquisa aprofundada: desativada"}
           >
             <Search size={12} />
-            Deep Research
+            Pesquisa aprofundada
           </button>
         </div>
         {deepResearch && corpusSync.syncing && corpusSync.itemsSynced > 0 && (
@@ -587,11 +668,11 @@ export function InputArea() {
             className="text-[11px] leading-snug"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            Searching over{' '}
+            Pesquisando em{' '}
             <span key={corpusSync.itemsSynced} className="sync-bump" style={{ color: 'var(--color-text-secondary)' }}>
               {corpusSync.itemsSynced.toLocaleString()}
             </span>{' '}
-            items — sync in progress, results will improve as more data is indexed.
+            itens — sincronização em andamento; os resultados melhorarão conforme os dados forem indexados.
           </div>
         )}
       </div>
@@ -608,7 +689,7 @@ export function InputArea() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={selectedModel ? 'Message OpenJarvis...' : 'Pick a model first (⌘K)...'}
+          placeholder={selectedModel ? "Envie uma mensagem ao OpenJarvis..." : "Selecione um modelo primeiro (⌘K)..."}
           rows={1}
           className="flex-1 bg-transparent outline-none resize-none text-sm leading-relaxed"
           style={{ color: 'var(--color-text)', maxHeight: '200px' }}
@@ -619,12 +700,17 @@ export function InputArea() {
             onClick={stopStreaming}
             className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer"
             style={{ background: 'var(--color-error)', color: 'var(--color-on-accent)' }}
-            title="Stop generating"
+            title="Parar geração"
           >
             <Square size={16} />
           </button>
         ) : (
           <div className="flex items-center gap-1">
+            {speechState !== 'idle' && (
+              <span role="status" className="text-xs" style={{ color: 'var(--color-accent)' }}>
+                {speechState === 'recording' ? 'Ouvindo… fale agora' : 'Transcrevendo…'}
+              </span>
+            )}
             <MicButton
               state={speechState}
               onClick={handleMicClick}
@@ -634,7 +720,7 @@ export function InputArea() {
             <button
               onClick={sendMessage}
               disabled={streamState.isStreaming || !input.trim() || modelLoading || !selectedModel}
-              title={selectedModel ? 'Send message' : 'Pick a model first (⌘K)'}
+              title={selectedModel ? "Enviar mensagem" : "Selecione um modelo primeiro (⌘K)"}
               className="p-2 rounded-xl transition-colors shrink-0 cursor-pointer disabled:opacity-30 disabled:cursor-default"
               style={{
                 background: input.trim() ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
@@ -648,8 +734,8 @@ export function InputArea() {
       </div>
       <div className="flex items-center justify-center mt-2 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
         <span>
-          <kbd className="font-mono">Enter</kbd> to send &middot;{' '}
-          <kbd className="font-mono">Shift+Enter</kbd> for new line
+          <kbd className="font-mono">Enter</kbd> para enviar ·{' '}
+          <kbd className="font-mono">Shift+Enter</kbd> para uma nova linha
         </span>
       </div>
     </div>

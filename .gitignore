@@ -131,3 +131,15 @@ learning.db
 minion_logs/
 *.oj-debug.json
 oj-debug.*.json
+
+# Local Jarvis installation and voice models
+.bootstrap/
+.runtime/
+books-programação/
+
+# Google OAuth secrets and local login tokens
+credentials.json
+token.json
+client_secret_*.json
+google-calendar-token.json
+google-calendar-client.json

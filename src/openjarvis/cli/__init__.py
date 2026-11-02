@@ -102,6 +102,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     from openjarvis.cli.agent_cmd import agent
     from openjarvis.cli.ask import ask
     from openjarvis.cli.bench_cmd import bench
+    from openjarvis.cli.calendar_cmd import calendar
     from openjarvis.cli.channel_cmd import channel
     from openjarvis.cli.channels_cmd import channels
     from openjarvis.cli.chat_cmd import chat
@@ -170,6 +171,7 @@ if not _DATA_BOUNDARY_BOOTSTRAP:
     cli.add_command(registry, "registry")
     cli.add_command(config, "config")
     cli.add_command(connect, "connect")
+    cli.add_command(calendar, "calendar")
     cli.add_command(digest, "digest")
 
     # Deep Research setup pulls the ingestion pipeline (embeddings/numpy). Guard

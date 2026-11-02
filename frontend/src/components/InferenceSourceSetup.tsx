@@ -125,7 +125,7 @@ export function InferenceSourceChooser({
   );
 }
 
-function BackButton({ onClick, label = 'Back', disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
+function BackButton({ onClick, label = "Voltar", disabled = false }: { onClick: () => void; label?: string; disabled?: boolean }) {
   return (
     <button
       type="button"
@@ -262,7 +262,7 @@ export function CustomEndpointSetup({
 
   return (
     <SetupFrame>
-      <BackButton onClick={onCancel} label="Cancel" disabled={busy} />
+      <BackButton onClick={onCancel} label="Cancelar" disabled={busy} />
       <form onSubmit={submit} className="flex flex-col gap-4">
         <div>
           <h2 className="text-base font-semibold mb-1" style={{ color: 'var(--color-text)' }}>
@@ -273,9 +273,9 @@ export function CustomEndpointSetup({
           </p>
         </div>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Server URL
+          URL do servidor
           <input
-            aria-label="Server URL"
+            aria-label="URL do servidor"
             type="url"
             required
             value={host}
@@ -298,9 +298,9 @@ export function CustomEndpointSetup({
           />
         </label>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Server type
+          Tipo de servidor
           <select
-            aria-label="Server type"
+            aria-label="Tipo de servidor"
             value={engine}
             onChange={(event) => setEngine(event.target.value)}
             className="block w-full mt-1.5 px-3 py-2 rounded-lg text-sm outline-none"
@@ -314,9 +314,9 @@ export function CustomEndpointSetup({
           </select>
         </label>
         <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          API key (optional)
+          Chave de API (opcional)
           <input
-            aria-label="API key"
+            aria-label="Chave de API"
             type="password"
             value={apiKey}
             onChange={(event) => setApiKey(event.target.value)}
@@ -333,7 +333,7 @@ export function CustomEndpointSetup({
           style={{ background: 'var(--color-accent)', color: 'white' }}
         >
           {busy && <Loader2 size={16} className="animate-spin" />}
-          {busy ? 'Connecting...' : 'Save and connect'}
+          {busy ? "Conectando..." : 'Save and connect'}
         </button>
       </form>
     </SetupFrame>

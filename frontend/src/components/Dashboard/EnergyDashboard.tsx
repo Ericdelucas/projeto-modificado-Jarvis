@@ -116,7 +116,7 @@ export function EnergyDashboard() {
       <div className="hud-panel p-6">
         <h3 className="hud-label flex items-center gap-2 mb-4">
           <Zap size={12} style={{ color: 'var(--color-accent)' }} />
-          Energy Monitoring
+          Monitoramento de energia
         </h3>
         <div className="h-48 flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
           <span className="hud-mono">{error || 'awaiting telemetry stream…'}</span>
@@ -129,41 +129,41 @@ export function EnergyDashboard() {
     <div className="hud-panel p-6">
       <h3 className="hud-label flex items-center gap-2 mb-4">
         <Zap size={12} style={{ color: 'var(--color-accent)' }} />
-        Energy Monitoring
+        Monitoramento de energia
       </h3>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <StatCard
           icon={Zap}
-          label="Total Energy"
+          label="Energia total"
           value={((energy.total_energy_j ?? 0) / 1000).toFixed(1)}
           unit="kJ"
         />
         <StatCard
           icon={Activity}
-          label="Energy / Token"
+          label="Energia por token"
           value={(energy.energy_per_token_j ?? 0).toFixed(3)}
           unit="J"
         />
         <StatCard
           icon={Thermometer}
-          label="Avg Power"
+          label="Potência média"
           value={(energy.avg_power_w ?? 0).toFixed(1)}
           unit="W"
         />
         <StatCard
           icon={Hash}
-          label="Total Requests"
+          label="Total de requisições"
           value={String(savings?.total_calls ?? telemetry?.total_requests ?? 0)}
         />
         <StatCard
           icon={Gauge}
-          label="Thermal"
+          label="Temperatura"
           value={thermalStatus.label}
         />
         <StatCard
           icon={Hash}
-          label="Tokens Processed"
+          label="Tokens processados"
           value={formatNumber(savings?.total_tokens ?? telemetry?.total_tokens ?? 0)}
         />
       </div>

@@ -26,7 +26,18 @@ from openjarvis.intelligence import (
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_TOOLS = frozenset({"think", "calculator", "web_search"})
+_DEFAULT_TOOLS = frozenset(
+    {
+        "think",
+        "calculator",
+        "web_search",
+        "google_calendar_today",
+        "whatsapp_today",
+        "open_app",
+        "gui_control",
+        "browser_task",
+    }
+)
 
 
 def _resolve_server_cors_origins(configured: object) -> list[str]:

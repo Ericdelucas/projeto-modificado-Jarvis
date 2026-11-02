@@ -74,7 +74,7 @@ function formatRelativeTime(ts?: number | null): string {
   if (!ts) return 'Never';
   const diff = Date.now() - ts * 1000;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
+  if (mins < 1) return "Agora mesmo";
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
@@ -82,7 +82,7 @@ function formatRelativeTime(ts?: number | null): string {
 }
 
 function formatSchedule(type?: string, value?: string): string {
-  if (!type || type === 'manual') return 'Manual';
+  if (!type || type === 'manual') return "Manual";
   if (type === 'cron') return value ? `Cron: ${value}` : 'Cron';
   if (type === 'interval') return value ? `Every ${value}` : 'Interval';
   return type;
@@ -104,7 +104,7 @@ function formatCost(cost?: number): string {
 // ---------------------------------------------------------------------------
 
 const AVAILABLE_TOOLS = [
-  { id: 'web_search', label: 'Web Search' },
+  { id: 'web_search', label: "Busca na web" },
   { id: 'code_interpreter', label: 'Code Interpreter' },
   { id: 'file_read', label: 'File Read' },
   { id: 'shell_exec', label: 'Shell Exec' },
@@ -260,7 +260,7 @@ function LaunchWizard({
                     cursor: 'pointer',
                   }}
                 >
-                  <div style={{ color: C.text, fontSize: 13, fontWeight: 500 }}>Custom Agent</div>
+                  <div style={{ color: C.text, fontSize: 13, fontWeight: 500 }}>Agente personalizado</div>
                   <div style={{ color: C.overlay0, fontSize: 11, marginTop: 2 }}>Start from scratch with full control</div>
                 </button>
                 {templates.map((t) => (
@@ -303,7 +303,7 @@ function LaunchWizard({
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
                   <label style={{ display: 'block', color: C.subtext0, fontSize: 12, marginBottom: 6, fontWeight: 500 }}>
-                    Schedule Type
+                    Tipo de agendamento
                   </label>
                   <select
                     style={selectStyle}
@@ -332,7 +332,7 @@ function LaunchWizard({
 
               <div>
                 <label style={{ display: 'block', color: C.subtext0, fontSize: 12, marginBottom: 6, fontWeight: 500 }}>
-                  Tools
+                  Ferramentas
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   {AVAILABLE_TOOLS.map((tool) => (
@@ -395,12 +395,12 @@ function LaunchWizard({
               <p style={{ color: C.subtext0, fontSize: 13, marginBottom: 12 }}>Review your configuration</p>
               <div style={{ background: C.surface0, borderRadius: 8, padding: 16, border: `1px solid ${C.border}` }}>
                 {[
-                  ['Name', wizard.name || '(unnamed)'],
+                  ["Nome", wizard.name || '(unnamed)'],
                   ['Template', wizard.templateId ? (templates.find((t) => t.id === wizard.templateId)?.name ?? wizard.templateId) : 'Custom'],
-                  ['Schedule', formatSchedule(wizard.scheduleType, wizard.scheduleValue)],
-                  ['Tools', wizard.selectedTools.length > 0 ? wizard.selectedTools.join(', ') : 'None'],
-                  ['Budget', wizard.budget ? `$${wizard.budget}` : 'Unlimited'],
-                  ['Learning', wizard.learningEnabled ? 'Enabled' : 'Disabled'],
+                  ["Agendamento", formatSchedule(wizard.scheduleType, wizard.scheduleValue)],
+                  ["Ferramentas", wizard.selectedTools.length > 0 ? wizard.selectedTools.join(', ') : "Nenhum"],
+                  ["Orçamento", wizard.budget ? `$${wizard.budget}` : "Sem limite"],
+                  ["Aprendizado", wizard.learningEnabled ? "Ativado" : "Desativado"],
                 ].map(([label, value]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: `1px solid ${C.border}`, fontSize: 13 }}>
                     <span style={{ color: C.overlay0 }}>{label}</span>
@@ -421,14 +421,14 @@ function LaunchWizard({
             onClick={() => wizard.step > 1 ? update({ step: (wizard.step - 1) as 1 | 2 | 3 }) : onClose()}
             style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: 'none', color: C.subtext0, cursor: 'pointer', fontSize: 13 }}
           >
-            {wizard.step === 1 ? 'Cancel' : 'Back'}
+            {wizard.step === 1 ? "Cancelar" : "Voltar"}
           </button>
           {wizard.step < 3 ? (
             <button
               onClick={() => update({ step: (wizard.step + 1) as 2 | 3 })}
               style={{ padding: '8px 16px', borderRadius: 6, border: 'none', background: C.accent, color: C.bg, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
             >
-              Next
+              Avançar
             </button>
           ) : (
             <button
@@ -636,7 +636,7 @@ function MemoryTab({ agent }: { agent: ManagedAgent }) {
   return (
     <div>
       <div style={{ color: C.subtext0, fontSize: 12, marginBottom: 8, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        Summary Memory
+        Memória resumida
       </div>
       <div style={{ background: C.surface0, borderRadius: 8, padding: 14, border: `1px solid ${C.border}` }}>
         <pre style={{
@@ -679,7 +679,7 @@ function OverviewTab({ agent, onRun, onPause, onResume, onRecover }: {
       {/* Stats */}
       <div style={{ background: C.surface0, borderRadius: 8, padding: '12px 16px', border: `1px solid ${C.border}` }}>
         <div style={rowStyle}>
-          <span style={labelStyle}>Status</span>
+          <span style={labelStyle}>Estado</span>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
@@ -694,7 +694,7 @@ function OverviewTab({ agent, onRun, onPause, onResume, onRecover }: {
           <span style={valueStyle}>{agent.agent_type}</span>
         </div>
         <div style={rowStyle}>
-          <span style={labelStyle}>Schedule</span>
+          <span style={labelStyle}>Agendamento</span>
           <span style={valueStyle}>{formatAgentSchedule(agent)}</span>
         </div>
         <div style={rowStyle}>
@@ -710,8 +710,8 @@ function OverviewTab({ agent, onRun, onPause, onResume, onRecover }: {
           <span style={valueStyle}>{formatCost(agent.total_cost)}</span>
         </div>
         <div style={{ ...rowStyle, borderBottom: 'none' }}>
-          <span style={labelStyle}>Budget</span>
-          <span style={valueStyle}>{agent.budget !== undefined ? `$${agent.budget}` : 'Unlimited'}</span>
+          <span style={labelStyle}>Orçamento</span>
+          <span style={valueStyle}>{agent.budget !== undefined ? `$${agent.budget}` : "Sem limite"}</span>
         </div>
         {/* Budget progress bar */}
         {agent.budget !== undefined && agent.budget > 0 && (
@@ -826,14 +826,14 @@ function LearningTabContent({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ color: C.subtext0, fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Learning
+            Aprendizado
           </span>
           <span style={{
             fontSize: 11, padding: '1px 8px', borderRadius: 8,
             background: learningEnabled ? C.green + '25' : C.surface0,
             color: learningEnabled ? C.green : C.overlay0,
           }}>
-            {learningEnabled ? 'Enabled' : 'Disabled'}
+            {learningEnabled ? "Ativado" : "Desativado"}
           </span>
         </div>
         <button
@@ -845,12 +845,12 @@ function LearningTabContent({
             fontSize: 12, fontWeight: 600, opacity: triggering ? 0.6 : 1,
           }}
         >
-          {triggering ? 'Running...' : 'Run Learning'}
+          {triggering ? 'Running...' : "Executar aprendizado"}
         </button>
       </div>
       {logs.length === 0 ? (
         <div style={{ color: C.overlay0, fontSize: 13, textAlign: 'center', marginTop: 32 }}>
-          No learning events yet. Run the agent or trigger learning manually.
+          Nenhum evento de aprendizado ainda. Execute o agente ou inicie o aprendizado manualmente.
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -931,7 +931,7 @@ function LogsTabContent({ apiUrl, agentId }: { apiUrl: string; agentId: string }
           </div>
           <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: 11, color: C.overlay0 }}>
             <span>{t.duration.toFixed(1)}s</span>
-            <span>{t.steps} step{t.steps !== 1 ? 's' : ''}</span>
+            <span>{t.steps} etapa{t.steps !== 1 ? 's' : ''}</span>
           </div>
         </div>
       ))}
@@ -946,12 +946,12 @@ function LogsTabContent({ apiUrl, agentId }: { apiUrl: string; agentId: string }
 type DetailTab = 'overview' | 'interact' | 'tasks' | 'memory' | 'learning' | 'logs';
 
 const DETAIL_TABS: { id: DetailTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
+  { id: 'overview', label: "Visão geral" },
   { id: 'interact', label: 'Interact' },
   { id: 'tasks', label: 'Tasks' },
-  { id: 'memory', label: 'Memory' },
-  { id: 'learning', label: 'Learning' },
-  { id: 'logs', label: 'Logs' },
+  { id: 'memory', label: "Memória" },
+  { id: 'learning', label: "Aprendizado" },
+  { id: 'logs', label: "Registros" },
 ];
 
 function DetailPanel({
@@ -1107,7 +1107,7 @@ export function AgentsPanel({ apiUrl }: Props) {
   if (loading) {
     return (
       <div style={{ padding: 40, color: C.overlay0, textAlign: 'center' }}>
-        Loading agents...
+        Carregando agentes...
       </div>
     );
   }
@@ -1160,7 +1160,7 @@ export function AgentsPanel({ apiUrl }: Props) {
                       background: 'none', border: 'none', color: C.overlay0,
                       cursor: 'pointer', fontSize: 14, padding: '0 2px', flexShrink: 0, lineHeight: 1,
                     }}
-                    title="Delete agent"
+                    title="Excluir agente"
                   >
                     ×
                   </button>
@@ -1169,7 +1169,7 @@ export function AgentsPanel({ apiUrl }: Props) {
                   {formatAgentSchedule(a)}
                 </div>
                 <div style={{ color: C.overlay1, fontSize: 11, marginTop: 2 }}>
-                  Last run: {formatRelativeTime(a.last_run_at)}
+                  Última execução: {formatRelativeTime(a.last_run_at)}
                 </div>
               </div>
             );

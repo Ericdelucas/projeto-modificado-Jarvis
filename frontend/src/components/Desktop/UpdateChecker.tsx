@@ -123,7 +123,7 @@ export function UpdateChecker() {
         <div style={styles.row}>
           <span>Update available: <strong>v{version}</strong></span>
           <div style={styles.actions}>
-            <button style={styles.primaryBtn} onClick={handleDownload}>Download</button>
+            <button style={styles.primaryBtn} onClick={handleDownload}>Baixar</button>
             <button style={styles.secondaryBtn} onClick={() => setDismissed(true)}>Later</button>
             <button style={styles.muteBtn} onClick={handleDisable}>Disable auto-updates</button>
           </div>

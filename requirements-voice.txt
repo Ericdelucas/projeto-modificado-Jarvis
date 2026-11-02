@@ -1,0 +1,4 @@
+# Install torch/torchaudio CPU wheels first:
+# .bootstrap/bin/uv pip install torch==2.8.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+coqui-tts==0.27.5
+transformers==4.57.6

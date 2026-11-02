@@ -184,3 +184,14 @@ except ImportError:
     pass
 
 __all__ = ["BaseTool", "ToolExecutor", "ToolSpec"]
+
+# Live read-only calendar tool (official Google imports remain lazy).
+import openjarvis.operators.browser_operator  # noqa: F401,E402
+import openjarvis.operators.gui_operator  # noqa: F401,E402
+import openjarvis.tools.google_calendar  # noqa: F401,E402
+
+# Local desktop launcher; executable names are explicitly mapped.
+import openjarvis.tools.open_app  # noqa: F401,E402
+
+# Read-only WhatsApp Web reader (Firefox WebDriver BiDi).
+import openjarvis.tools.whatsapp_web  # noqa: F401,E402

@@ -531,7 +531,7 @@ export function TraceDebugger({ apiUrl }: { apiUrl: string }) {
                 <div style={styles.traceItemId}>{truncateId(trace.id)}</div>
                 <div style={styles.traceItemQuery}>{trace.query}</div>
                 <div style={styles.traceItemMeta}>
-                  <span>{trace.steps.length} steps</span>
+                  <span>{trace.steps.length} etapas</span>
                   <span>{formatTimestamp(trace.created_at)}</span>
                 </div>
               </div>
@@ -556,7 +556,7 @@ export function TraceDebugger({ apiUrl }: { apiUrl: string }) {
           <>
             <div style={styles.detailHeader}>
               <h3 style={styles.detailTitle}>
-                Trace {truncateId(traceDetail.id)}
+                Rastreamento {truncateId(traceDetail.id)}
               </h3>
               <p style={styles.detailQuery}>
                 Query: &quot;{traceDetail.query}&quot;

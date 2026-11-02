@@ -11,6 +11,7 @@ fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient  # noqa: E402
 
 from openjarvis.core.events import EventBus, EventType  # noqa: E402
+from openjarvis.core.language import DEFAULT_SYSTEM_PROMPT  # noqa: E402
 from openjarvis.core.types import Role  # noqa: E402
 from openjarvis.server.app import create_app  # noqa: E402
 
@@ -965,7 +966,7 @@ class TestIdentityPromptInjection:
         msgs = captured[-1]
         system_msgs = [m for m in msgs if m.role.value == "system"]
         assert len(system_msgs) == 1
-        assert system_msgs[0].content == "Be terse."
+        assert system_msgs[0].content == "Be terse.\n\n" + DEFAULT_SYSTEM_PROMPT
 
     def test_stream_uses_grounded_agent_result_without_replay(self):
         """Regression for #734: web streaming emits the agent's final answer."""
@@ -1046,7 +1047,7 @@ class TestIdentityPromptInjection:
         msgs = engine.generate.call_args.args[0]
         system_msgs = [m for m in msgs if m.role.value == "system"]
         assert len(system_msgs) == 1
-        assert system_msgs[0].content == "Be terse."
+        assert system_msgs[0].content == "Be terse.\n\n" + DEFAULT_SYSTEM_PROMPT
 
     def test_direct_normalizes_mid_history_system_messages(self):
         captured: list = []
@@ -1075,7 +1076,10 @@ class TestIdentityPromptInjection:
             Role.ASSISTANT,
             Role.USER,
         ]
-        assert messages[0].content == "First instruction.\n\nSecond instruction."
+        assert (
+            messages[0].content
+            == "First instruction.\n\nSecond instruction.\n\n" + DEFAULT_SYSTEM_PROMPT
+        )
         assert [message.content for message in messages[1:]] == [
             "before",
             "reply",
@@ -1111,7 +1115,10 @@ class TestIdentityPromptInjection:
             Role.ASSISTANT,
             Role.USER,
         ]
-        assert messages[0].content == "First instruction.\n\nSecond instruction."
+        assert (
+            messages[0].content
+            == "First instruction.\n\nSecond instruction.\n\n" + DEFAULT_SYSTEM_PROMPT
+        )
         assert [message.content for message in messages[1:]] == [
             "before",
             "reply",
@@ -1452,7 +1459,10 @@ class TestIdentityPromptInjection:
             Role.ASSISTANT,
             Role.USER,
         ]
-        assert messages[0].content == "First instruction.\n\nSecond instruction."
+        assert (
+            messages[0].content
+            == "First instruction.\n\nSecond instruction.\n\n" + DEFAULT_SYSTEM_PROMPT
+        )
         assert [message.content for message in messages[1:]] == [
             "before",
             "reply",
@@ -1497,7 +1507,10 @@ class TestIdentityPromptInjection:
         )
 
         assert result[0].role == Role.SYSTEM
-        assert result[0].content == "First instruction.\n\nSecond instruction."
+        assert (
+            result[0].content
+            == "First instruction.\n\nSecond instruction.\n\n" + DEFAULT_SYSTEM_PROMPT
+        )
         assert result[0].metadata == {"source": "first"}
         assert result[1:] == [first_user, assistant, final_user]
 
@@ -1517,7 +1530,11 @@ class TestIdentityPromptInjection:
 
         result = _ensure_identity_prompt(messages, _identity_config())
 
-        assert result == messages
+        assert (
+            result[0].content == caller_prompt.content + "\n\n" + DEFAULT_SYSTEM_PROMPT
+        )
+        assert result[0].metadata == {}
+        assert result[1:] == messages[1:]
 
 
 # ---------------------------------------------------------------------------

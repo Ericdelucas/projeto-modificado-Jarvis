@@ -122,7 +122,7 @@ function FilesystemPanel({
           }}
         >
           {isConnecting ? <Loader2 size={14} className="animate-spin" /> : <FolderOpen size={14} />}
-          Connect
+          Conectar
         </button>
       </div>
       <button
@@ -202,7 +202,7 @@ function OAuthPanel({
           }}
         >
           <ExternalLink size={14} />
-          Connect {displayName}
+          Conectar {displayName}
         </button>
       )}
       <button
@@ -354,7 +354,7 @@ function StepByStepPanel({
             color: 'var(--color-accent-purple)', fontSize: 11,
             fontWeight: 600, marginBottom: 4,
           }}>
-            STEP {i + 1}
+            ETAPA {i + 1}
           </div>
           <div style={{
             color: 'var(--color-text)',
@@ -454,7 +454,7 @@ function StepByStepPanel({
             cursor: 'pointer',
           }}
         >
-          {isConnecting ? 'Connecting...' : `Connect ${connector.display_name}`}
+          {isConnecting ? "Conectando..." : `Connect ${connector.display_name}`}
         </button>
         <button
           onClick={onSkip}
@@ -579,7 +579,7 @@ export function SourceConnectFlow({
               <div className="flex items-center gap-2 text-sm"
                 style={{ color: 'var(--color-accent)' }}>
                 <CheckCircle2 size={18} />
-                Connected
+                Conectado
               </div>
             ) : activeCard.steps ? (
               <StepByStepPanel

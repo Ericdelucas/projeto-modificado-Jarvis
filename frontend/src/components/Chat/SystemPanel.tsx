@@ -3,7 +3,6 @@ import {
   Zap,
   Activity,
   Thermometer,
-  DollarSign,
   TrendingDown,
   Cloud,
   HardDrive,
@@ -14,6 +13,8 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
 import { getBase } from '../../lib/api';
+import { SHOW_COST_COMPARISON } from '../../lib/ui-config';
+import { AudioControl } from './AudioControl';
 
 interface EnergyData {
   total_energy_j?: number;
@@ -38,6 +39,7 @@ export function SystemPanel() {
   const savings = useAppStore((s) => s.savings);
   const toggleSystemPanel = useAppStore((s) => s.toggleSystemPanel);
   const optInEnabled = useAppStore((s) => s.optInEnabled);
+  const setOptIn = useAppStore((s) => s.setOptIn);
   const setOptInModalOpen = useAppStore((s) => s.setOptInModalOpen);
   const liveEnergy = useAppStore((s) => s.liveEnergy);
   const [energy, setEnergy] = useState<EnergyData | null>(null);
@@ -91,51 +93,55 @@ export function SystemPanel() {
         style={{ borderBottom: '1px solid var(--color-border)' }}
       >
         <span className="text-xs font-semibold tracking-wide uppercase" style={{ color: 'var(--color-text-secondary)' }}>
-          System
+          Sistema
         </span>
         <button
           onClick={toggleSystemPanel}
           className="p-1 rounded-md transition-colors cursor-pointer"
           style={{ color: 'var(--color-text-tertiary)' }}
-          title="Close panel"
+          title="Fechar painel"
         >
           <X size={14} />
         </button>
       </div>
 
       <div className="flex flex-col gap-4 p-4">
+        <section>
+          <h4 className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--color-text-tertiary)' }}>Áudio</h4>
+          <AudioControl />
+        </section>
         {/* Session Stats */}
         <section>
           <h4 className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Session
+            Sessão
           </h4>
           <div className="grid grid-cols-2 gap-2">
-            <MiniStat icon={Hash} label="Requests" value={String(savings?.total_calls ?? telemetry?.total_requests ?? 0)} />
-            <MiniStat icon={Hash} label="Output Tokens" value={formatNumber(savings?.total_completion_tokens ?? telemetry?.total_tokens ?? 0)} />
+            <MiniStat icon={Hash} label="Requisições" value={String(savings?.total_calls ?? telemetry?.total_requests ?? 0)} />
+            <MiniStat icon={Hash} label="Tokens de saída" value={formatNumber(savings?.total_completion_tokens ?? telemetry?.total_tokens ?? 0)} />
           </div>
         </section>
 
         {/* Device */}
         <section>
           <h4 className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Device
+            Dispositivo
           </h4>
           <div className="grid grid-cols-2 gap-2">
             {energy?.cpu_temp_c != null && (
-              <MiniStat icon={Thermometer} label="CPU Temp" value={String(Math.round(energy.cpu_temp_c))} unit="°C" />
+              <MiniStat icon={Thermometer} label="Temperatura da CPU" value={String(Math.round(energy.cpu_temp_c))} unit="°C" />
             )}
             {energy?.gpu_temp_c != null && (
-              <MiniStat icon={Thermometer} label="GPU Temp" value={String(Math.round(energy.gpu_temp_c))} unit="°C" />
+              <MiniStat icon={Thermometer} label="Temperatura da GPU" value={String(Math.round(energy.gpu_temp_c))} unit="°C" />
             )}
             <MiniStat
               icon={Zap}
-              label="Power"
+              label="Potência"
               value={(liveEnergy?.power_w ?? energy?.avg_power_w ?? 0).toFixed(1)}
               unit="W"
             />
             <MiniStat
               icon={Activity}
-              label="Energy"
+              label="Energia"
               value={(
                 ((liveEnergy?.energy_j ?? energy?.total_energy_j ?? 0) / 1000)
               ).toFixed(1)}
@@ -146,61 +152,62 @@ export function SystemPanel() {
 
 
         {/* Cost Comparison */}
-        <section>
-          <h4 className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Cost Comparison
-          </h4>
+        {SHOW_COST_COMPARISON && (
+          <section>
+            <h4 className="text-[11px] font-medium uppercase tracking-wide mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
+              Comparação de custos
+            </h4>
 
-          {/* Local */}
-          <div
-            className="flex items-center gap-2 rounded-lg px-3 py-2 mb-2"
-            style={{ background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent)' }}
-          >
-            <HardDrive size={14} style={{ color: 'var(--color-accent)' }} />
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium truncate" style={{ color: 'var(--color-text)' }}>Local</div>
+            {/* Local */}
+            <div
+              className="flex items-center gap-2 rounded-lg px-3 py-2 mb-2"
+              style={{ background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent)' }}
+            >
+              <HardDrive size={14} style={{ color: 'var(--color-accent)' }} />
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium truncate" style={{ color: 'var(--color-text)' }}>Local</div>
+              </div>
+              <div className="text-sm font-semibold" style={{ color: 'var(--color-success)' }}>
+                ${(savings?.local_cost ?? 0).toFixed(4)}
+              </div>
             </div>
-            <div className="text-sm font-semibold" style={{ color: 'var(--color-success)' }}>
-              ${(savings?.local_cost ?? 0).toFixed(4)}
-            </div>
-          </div>
 
-          {/* Cloud providers */}
-          <div className="flex flex-col gap-1.5">
-            {CLOUD_PRICING.map((provider) => {
-              const cost = (promptK * provider.input) / 1000 + (completionK * provider.output) / 1000;
-              const saved = cost - (savings?.local_cost ?? 0);
-              return (
-                <div
-                  key={provider.name}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2"
-                  style={{
-                    background: provider.primary ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
-                    border: provider.primary ? '1px solid var(--color-border-accent, var(--color-accent))' : '1px solid transparent',
-                  }}
-                >
-                  <Cloud size={14} style={{ color: 'var(--color-text-tertiary)' }} />
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="text-xs truncate"
-                      style={{
-                        color: provider.primary ? 'var(--color-text)' : 'var(--color-text-secondary)',
-                        fontWeight: provider.primary ? 500 : 400,
-                      }}
-                    >
-                      {provider.name}
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-xs font-mono" style={{ color: 'var(--color-text)' }}>
-                      ${cost.toFixed(4)}
-                    </div>
-                    {saved > 0.0001 && (
-                      <div className="text-[9px] flex items-center gap-0.5 justify-end" style={{ color: 'var(--color-success)' }}>
-                        <TrendingDown size={8} />
-                        ${saved.toFixed(4)}
+            {/* Cloud providers */}
+            <div className="flex flex-col gap-1.5">
+              {CLOUD_PRICING.map((provider) => {
+                const cost = (promptK * provider.input) / 1000 + (completionK * provider.output) / 1000;
+                const saved = cost - (savings?.local_cost ?? 0);
+                return (
+                  <div
+                    key={provider.name}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2"
+                    style={{
+                      background: provider.primary ? 'var(--color-bg-secondary)' : 'var(--color-bg-secondary)',
+                      border: provider.primary ? '1px solid var(--color-border-accent, var(--color-accent))' : '1px solid transparent',
+                    }}
+                  >
+                    <Cloud size={14} style={{ color: 'var(--color-text-tertiary)' }} />
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className="text-xs truncate"
+                        style={{
+                          color: provider.primary ? 'var(--color-text)' : 'var(--color-text-secondary)',
+                          fontWeight: provider.primary ? 500 : 400,
+                        }}
+                      >
+                        {provider.name}
                       </div>
-                    )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-xs font-mono" style={{ color: 'var(--color-text)' }}>
+                        ${cost.toFixed(4)}
+                      </div>
+                      {saved > 0.0001 && (
+                        <div className="text-[9px] flex items-center gap-0.5 justify-end" style={{ color: 'var(--color-success)' }}>
+                          <TrendingDown size={8} />
+                          ${saved.toFixed(4)}
+                        </div>
+        )}
                   </div>
                 </div>
               );
@@ -210,17 +217,29 @@ export function SystemPanel() {
 
         </section>
 
+        )}
+
         {/* Leaderboard / Share */}
         <section>
           <h4
             className="text-[11px] font-medium uppercase tracking-wide mb-2"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            Leaderboard
+            Ranking
           </h4>
 
           <button
-            onClick={() => setOptInModalOpen(true)}
+            role="switch"
+            aria-checked={optInEnabled}
+            aria-label="Compartilhar economia no ranking"
+            onClick={() => {
+              if (optInEnabled) {
+                setOptIn(false, '', '');
+                setOptInModalOpen(false);
+              } else {
+                setOptInModalOpen(true);
+              }
+            }}
             className="w-full flex items-center gap-2 rounded-lg px-3 py-2.5 transition-colors cursor-pointer"
             style={{
               background: optInEnabled
@@ -243,7 +262,7 @@ export function SystemPanel() {
                 color: optInEnabled ? 'var(--color-accent)' : 'var(--color-text-secondary)',
               }}
             >
-              {optInEnabled ? 'Sharing Savings' : 'Share Your Savings'}
+              {optInEnabled ? 'Compartilhando economia' : 'Compartilhar economia'}
             </span>
             <span
               className="text-[9px] px-1.5 py-0.5 rounded-full"
@@ -266,7 +285,7 @@ export function SystemPanel() {
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-tertiary)')}
           >
             <ExternalLink size={10} />
-            View Leaderboard
+            Ver ranking
           </a>
         </section>
       </div>

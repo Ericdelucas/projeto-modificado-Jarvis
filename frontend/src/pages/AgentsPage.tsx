@@ -130,7 +130,7 @@ function formatRelativeTime(ts?: number | null): string {
   if (!ts) return 'Never';
   const diff = Date.now() - ts * 1000;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
+  if (mins < 1) return "Agora mesmo";
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours}h ago`;
@@ -138,7 +138,7 @@ function formatRelativeTime(ts?: number | null): string {
 }
 
 function formatSchedule(type?: string, value?: string): string {
-  if (!type || type === 'manual') return 'Manual';
+  if (!type || type === 'manual') return "Manual";
   if (type === 'cron' && value) {
     // Try to display human-readable for common cron patterns
     const parts = value.trim().split(/\s+/);
@@ -179,7 +179,7 @@ function formatSchedule(type?: string, value?: string): string {
     }
     return `Every ${value}`;
   }
-  return type || 'Manual';
+  return type || "Manual";
 }
 
 function formatAgentSchedule(agent: ManagedAgent): string {
@@ -406,7 +406,7 @@ function ToolsPicker({
           className="block text-[13px] font-medium"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          Tools
+          Ferramentas
         </label>
         <div className="flex items-center gap-2">
           <span
@@ -457,8 +457,7 @@ function ToolsPicker({
         className="text-[10.5px] mb-2"
         style={{ color: 'var(--color-text-tertiary)' }}
       >
-        What the agent is allowed to call. An empty selection makes a
-        chat-only agent.
+        Ferramentas que o agente pode usar. Sem seleção, o agente apenas conversa.
       </p>
       {tools.length === 0 ? (
         <div
@@ -469,7 +468,7 @@ function ToolsPicker({
             color: 'var(--color-text-tertiary)',
           }}
         >
-          Loading available tools…
+          Carregando ferramentas disponíveis…
         </div>
       ) : (
         <div
@@ -768,7 +767,7 @@ function LaunchWizard({
   }
 
   const formatScheduleLabel = (type: string, value: string) => {
-    if (type === 'manual') return 'Manual (run on demand)';
+    if (type === 'manual') return "Manual (executar sob demanda)";
     if (type === 'cron') return `Cron: ${value}`;
     if (type === 'interval') {
       const secs = parseInt(value, 10);
@@ -785,7 +784,7 @@ function LaunchWizard({
       <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.6)' }}>
         <div className="rounded-xl p-6 w-full max-w-lg" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>New Agent — Choose Template</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>Novo agente — escolha um modelo</h2>
             <button onClick={onClose} className="p-1 rounded hover:bg-opacity-10" style={{ color: 'var(--color-text-tertiary)' }}><X size={18} /></button>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -824,9 +823,9 @@ function LaunchWizard({
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">⚙️</span>
-                <span className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>Custom Agent</span>
+                <span className="font-semibold text-sm" style={{ color: 'var(--color-text)' }}>Agente personalizado</span>
               </div>
-              <div className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)', textAlign: 'left' }}>Start from scratch. Pick your own tools, schedule, and behavior.</div>
+              <div className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)', textAlign: 'left' }}>Comece do zero. Escolha ferramentas, agendamento e comportamento.</div>
             </button>
           </div>
         </div>
@@ -851,11 +850,11 @@ function LaunchWizard({
         <div className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Agent Name</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Nome do agente</label>
             <input
               value={wizard.name}
               onChange={(e) => setWizard((w) => ({ ...w, name: e.target.value }))}
-              placeholder="e.g. AI Research Tracker"
+              placeholder="Ex.: Monitor de pesquisas em IA"
               className="w-full px-3 py-2 rounded-lg text-sm bg-transparent"
               style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
             />
@@ -863,18 +862,18 @@ function LaunchWizard({
 
           {/* Instruction */}
           <div>
-            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>What should this agent do?</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>O que este agente deve fazer?</label>
             <textarea
               value={wizard.instruction}
               onChange={(e) => setWizard((w) => ({ ...w, instruction: e.target.value }))}
-              placeholder="e.g. Monitor the latest research papers on reasoning and chain-of-thought in LLMs"
+              placeholder="Ex.: Monitorar artigos recentes sobre raciocínio e cadeia de pensamento em modelos de linguagem"
               rows={3}
               className="w-full px-3 py-2 rounded-lg text-sm bg-transparent resize-none"
               style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
             />
             {wizard.instruction.includes('[') && (
               <p className="text-[10px] mt-1" style={{ color: 'var(--color-warning)' }}>
-                Replace the [bracketed text] with your own values
+                Substitua o [texto entre colchetes] pelos seus valores
               </p>
             )}
           </div>
@@ -891,7 +890,7 @@ function LaunchWizard({
           {/* Model + Schedule row */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Intelligence</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Inteligência</label>
               <select
                 value={wizard.model}
                 onChange={(e) => setWizard((w) => ({ ...w, model: e.target.value }))}
@@ -906,18 +905,18 @@ function LaunchWizard({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Schedule</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Agendamento</label>
               <select
                 value={wizard.scheduleType}
                 onChange={(e) => setWizard((w) => ({ ...w, scheduleType: e.target.value, scheduleValue: e.target.value === 'manual' ? '' : w.scheduleValue }))}
                 className="w-full px-3 py-2 rounded-lg text-sm"
                 style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               >
-                <option value="manual">Manual (run on demand)</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="hourly">Every N hours</option>
-                <option value="cron">Custom (cron expression)</option>
+                <option value="manual">Manual (executar sob demanda)</option>
+                <option value="daily">Diário</option>
+                <option value="weekly">Semanal</option>
+                <option value="hourly">A cada N horas</option>
+                <option value="cron">Personalizado (expressão cron)</option>
               </select>
               {wizard.scheduleType === 'daily' && (
                 <select
@@ -981,7 +980,7 @@ function LaunchWizard({
               )}
               {wizard.scheduleType === 'hourly' && (
                 <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>Every</span>
+                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>A cada</span>
                   <input
                     type="number" min="1" max="24"
                     value={(() => { const secs = parseInt(wizard.scheduleValue || '0', 10); return secs > 0 ? Math.round(secs / 3600) : 1; })()}
@@ -992,7 +991,7 @@ function LaunchWizard({
                     className="w-14 px-2 py-1 rounded text-xs text-center"
                     style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                   />
-                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>hours</span>
+                  <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>horas</span>
                 </div>
               )}
               {wizard.scheduleType === 'cron' && (
@@ -1011,7 +1010,7 @@ function LaunchWizard({
           {wizard.selectedTools.length > 0 && (
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-                Tools <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 400 }}>(from template)</span>
+                Ferramentas <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 400 }}>(do modelo)</span>
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {wizard.selectedTools.map((t) => (
@@ -1024,74 +1023,74 @@ function LaunchWizard({
           {/* Advanced Settings */}
           <details className="rounded-lg" style={{ border: '1px solid var(--color-border)' }}>
             <summary className="px-3 py-2 cursor-pointer text-sm font-medium" style={{ color: 'var(--color-text-tertiary)' }}>
-              Advanced Settings <span className="text-xs font-normal">(optional)</span>
+              Configurações avançadas <span className="text-xs font-normal">(opcional)</span>
             </summary>
             <div className="px-3 pb-3 pt-1 space-y-3" style={{ borderTop: '1px solid var(--color-border)' }}>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Memory Extraction<Tooltip text="How the agent remembers context between runs" /></label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Extração de memória<Tooltip text="How the agent remembers context between runs" /></label>
                   <select value={wizard.memoryExtraction} onChange={(e) => setWizard((w) => ({ ...w, memoryExtraction: e.target.value }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
-                    <option value="structured_json">Structured JSON</option>
-                    <option value="causality_graph">Causality Graph</option>
-                    <option value="scratchpad">Scratchpad</option>
-                    <option value="none">None</option>
+                    <option value="structured_json">JSON estruturado</option>
+                    <option value="causality_graph">Grafo de causalidade</option>
+                    <option value="scratchpad">Bloco de notas</option>
+                    <option value="none">Nenhum</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Observation Compression<Tooltip text="How the agent summarizes long tool outputs" /></label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Compressão de observações<Tooltip text="How the agent summarizes long tool outputs" /></label>
                   <select value={wizard.observationCompression} onChange={(e) => setWizard((w) => ({ ...w, observationCompression: e.target.value }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
-                    <option value="summarize">Summarize</option>
-                    <option value="truncate">Truncate</option>
-                    <option value="none">None</option>
+                    <option value="summarize">Resumir</option>
+                    <option value="truncate">Truncar</option>
+                    <option value="none">Nenhum</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Retrieval Strategy<Tooltip text="How the agent searches your knowledge base" /></label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Estratégia de recuperação<Tooltip text="How the agent searches your knowledge base" /></label>
                   <select value={wizard.retrievalStrategy} onChange={(e) => setWizard((w) => ({ ...w, retrievalStrategy: e.target.value }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
                     <option value="sqlite">BM25 (SQLite FTS5)</option>
-                    <option value="hybrid">Hybrid (BM25 + Semantic)</option>
+                    <option value="hybrid">Híbrida (BM25 + semântica)</option>
                     <option value="colbert">ColBERTv2</option>
-                    <option value="none">None</option>
+                    <option value="none">Nenhum</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Task Decomposition<Tooltip text="How the agent breaks complex tasks into steps" /></label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Decomposição de tarefas<Tooltip text="How the agent breaks complex tasks into steps" /></label>
                   <select value={wizard.taskDecomposition} onChange={(e) => setWizard((w) => ({ ...w, taskDecomposition: e.target.value }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
-                    <option value="hierarchical">Hierarchical</option>
-                    <option value="phased">Phased</option>
-                    <option value="monolithic">Monolithic</option>
+                    <option value="hierarchical">Hierárquica</option>
+                    <option value="phased">Por fases</option>
+                    <option value="monolithic">Monolítica</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Max Turns</label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Máximo de interações</label>
                   <input type="number" value={wizard.maxTurns} onChange={(e) => setWizard((w) => ({ ...w, maxTurns: parseInt(e.target.value, 10) || 25 }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Temperature</label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Temperatura</label>
                   <input type="number" step="0.1" min="0" max="2" value={wizard.temperature}
                     onChange={(e) => setWizard((w) => ({ ...w, temperature: parseFloat(e.target.value) || 0.3 }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Budget ($)</label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Orçamento (US$)</label>
                   <input type="number" step="0.01" value={wizard.budget} onChange={(e) => setWizard((w) => ({ ...w, budget: e.target.value }))}
-                    placeholder="Unlimited"
+                    placeholder="Sem limite"
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }} />
                 </div>
                 <div>
-                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Schedule Type</label>
+                  <label className="block text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>Tipo de agendamento</label>
                   <select value={wizard.scheduleType} onChange={(e) => setWizard((w) => ({ ...w, scheduleType: e.target.value, scheduleValue: e.target.value === 'manual' ? '' : w.scheduleValue }))}
                     className="w-full px-2 py-1 rounded text-xs" style={{ background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}>
                     <option value="manual">Manual</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="hourly">Every N hours</option>
-                    <option value="cron">Custom (cron)</option>
+                    <option value="daily">Diário</option>
+                    <option value="weekly">Semanal</option>
+                    <option value="hourly">A cada N horas</option>
+                    <option value="cron">Personalizado (cron)</option>
                   </select>
                 </div>
               </div>
@@ -1109,7 +1108,7 @@ function LaunchWizard({
               {launching ? 'Creating...' : 'Launch Agent'}
             </button>
             <button onClick={onClose} className="px-4 py-2.5 rounded-lg text-sm" style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
-              Cancel
+              Cancelar
             </button>
           </div>
         </div>
@@ -1149,7 +1148,7 @@ function OverflowMenu({
         }}
         className="p-1 rounded cursor-pointer"
         style={{ color: 'var(--color-text-tertiary)' }}
-        title="More actions"
+        title="Mais ações"
       >
         <MoreHorizontal size={14} />
       </button>
@@ -1167,7 +1166,7 @@ function OverflowMenu({
             className="w-full text-left px-3 py-1.5 text-xs cursor-pointer flex items-center gap-2"
             style={{ color: 'var(--color-error)' }}
           >
-            <Trash2 size={12} /> Delete
+            <Trash2 size={12} /> Excluir
           </button>
         </div>
       )}
@@ -1227,14 +1226,14 @@ function AgentCard({
       <div className="text-xs mb-2 flex items-center gap-3" style={{ color: 'var(--color-text-tertiary)' }}>
         <span>{formatAgentSchedule(agent)}</span>
         <span>·</span>
-        <span>Last run: {formatRelativeTime(agent.last_run_at)}</span>
+        <span>Última execução: {formatRelativeTime(agent.last_run_at)}</span>
       </div>
 
       {/* Row 3: Stats */}
       <div className="flex items-center gap-4 mb-3 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
         <span className="flex items-center gap-1">
           <Activity size={11} />
-          {agent.total_runs ?? 0} runs
+          {agent.total_runs ?? 0} execuções
         </span>
         <span className="flex items-center gap-1">
           <DollarSign size={11} />
@@ -1246,7 +1245,7 @@ function AgentCard({
       {(agent.config?.max_cost as number) > 0 && (
         <div className="mb-3">
           <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>
-            <span>Budget</span>
+            <span>Orçamento</span>
             <span>
               {formatCost(agent.total_cost)} / ${(agent.config?.max_cost as number).toFixed(0)}
             </span>
@@ -1274,7 +1273,7 @@ function AgentCard({
           onClick={(e) => { e.stopPropagation(); onChat(agent.id); }}
           className="p-1.5 rounded cursor-pointer transition-colors"
           style={{ background: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)' }}
-          title="Chat with agent"
+          title="Conversar com agente"
         >
           <MessageSquare size={13} />
         </button>
@@ -1282,7 +1281,7 @@ function AgentCard({
           onClick={(e) => { e.stopPropagation(); onEdit(agent.id); }}
           className="p-1.5 rounded cursor-pointer transition-colors"
           style={{ background: 'var(--color-bg-tertiary)', color: 'var(--color-text-secondary)' }}
-          title="Edit agent"
+          title="Editar agente"
         >
           <Pencil size={13} />
         </button>
@@ -1290,16 +1289,16 @@ function AgentCard({
           onClick={() => onRun(agent.id)}
           className="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer transition-colors"
           style={{ background: 'var(--color-accent)' + '15', color: 'var(--color-accent)' }}
-          title="Run now"
+          title="Executar agora"
         >
-          <Zap size={11} /> Run Now
+          <Zap size={11} /> Executar agora
         </button>
         {canPause && (
           <button
             onClick={() => onPause(agent.id)}
             className="p-1 rounded cursor-pointer"
             style={{ color: 'var(--color-text-secondary)' }}
-            title="Pause"
+            title="Pausar"
           >
             <Pause size={13} />
           </button>
@@ -1309,7 +1308,7 @@ function AgentCard({
             onClick={() => onResume(agent.id)}
             className="p-1 rounded cursor-pointer"
             style={{ color: 'var(--color-success)' }}
-            title="Resume"
+            title="Retomar"
           >
             <Play size={13} />
           </button>
@@ -1319,9 +1318,9 @@ function AgentCard({
             onClick={() => onRecover(agent.id)}
             className="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer"
             style={{ background: 'var(--color-error)20', color: 'var(--color-error)' }}
-            title="Recover agent"
+            title="Recuperar agente"
           >
-            <AlertTriangle size={11} /> Recover
+            <AlertTriangle size={11} /> Recuperar
           </button>
         )}
         <div className="ml-auto">
@@ -1356,14 +1355,14 @@ function AgentInstructionSection({ agent, onAgentUpdated }: { agent: ManagedAgen
       style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
     >
       <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Instruction</h3>
+        <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Instrução</h3>
         {!editing && (
           <button
             onClick={() => { setDraft(currentInstruction); setEditing(true); }}
             className="text-xs px-2 py-0.5 rounded cursor-pointer"
             style={{ color: 'var(--color-accent)', border: '1px solid var(--color-accent)', opacity: 0.8 }}
           >
-            Edit
+            Editar
           </button>
         )}
       </div>
@@ -1378,8 +1377,8 @@ function AgentInstructionSection({ agent, onAgentUpdated }: { agent: ManagedAgen
             style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
           />
           <div className="flex gap-2">
-            <button onClick={save} className="text-xs px-3 py-1 rounded font-medium cursor-pointer" style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}>Save</button>
-            <button onClick={() => setEditing(false)} className="text-xs px-3 py-1 rounded cursor-pointer" style={{ color: 'var(--color-text-tertiary)', border: '1px solid var(--color-border)' }}>Cancel</button>
+            <button onClick={save} className="text-xs px-3 py-1 rounded font-medium cursor-pointer" style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}>Salvar</button>
+            <button onClick={() => setEditing(false)} className="text-xs px-3 py-1 rounded cursor-pointer" style={{ color: 'var(--color-text-tertiary)', border: '1px solid var(--color-border)' }}>Cancelar</button>
           </div>
         </div>
       ) : (
@@ -1463,9 +1462,9 @@ function AgentConfigGrid({ agent, onAgentUpdated }: { agent: ManagedAgent; onAge
       : 'var(--color-text-tertiary)';
 
   const rows: [string, React.ReactNode][] = [
-    ['Intelligence', editingModel ? (
+    ["Inteligência", editingModel ? (
       changingModel ? (
-        <span className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Switching model...</span>
+        <span className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>Trocando modelo...</span>
       ) : (
         <select
           autoFocus
@@ -1504,7 +1503,7 @@ function AgentConfigGrid({ agent, onAgentUpdated }: { agent: ManagedAgent; onAge
         />
         <span style={{ color: 'var(--color-text)' }}>{currentModel}</span>
         {modelAvailable === 'unavailable' && (
-          <span className="text-xs" style={{ color: 'var(--color-error)' }}>Not available</span>
+          <span className="text-xs" style={{ color: 'var(--color-error)' }}>Indisponível</span>
         )}
         <button
           onClick={startEditingModel}
@@ -1515,15 +1514,15 @@ function AgentConfigGrid({ agent, onAgentUpdated }: { agent: ManagedAgent; onAge
             opacity: 0.8,
           }}
         >
-          Change
+          Alterar
         </button>
       </span>
     )],
     ['Agent Type', <span key="at">{agent.agent_type}</span>],
-    ['Schedule', <span key="sc">{formatAgentSchedule(agent)}</span>],
+    ["Agendamento", <span key="sc">{formatAgentSchedule(agent)}</span>],
     ['Last Run', <span key="lr">{formatRelativeTime(agent.last_run_at)}</span>],
-    ['Budget', <span key="bg">{agent.budget ? formatCost(agent.budget) : 'Unlimited'}</span>],
-    ['Learning', <span key="le">{agent.learning_enabled ? 'Enabled' : 'Disabled'}</span>],
+    ["Orçamento", <span key="bg">{agent.budget ? formatCost(agent.budget) : "Sem limite"}</span>],
+    ["Aprendizado", <span key="le">{agent.learning_enabled ? "Ativado" : "Desativado"}</span>],
   ];
 
   return (
@@ -1797,7 +1796,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
           style={{ color: 'var(--color-text)' }}
         >
           <Activity size={14} style={{ color: 'var(--color-accent)' }} />
-          Activity trace
+          Rastreamento de atividade
         </div>
         <div
           className="flex items-center gap-2 text-xs"
@@ -1809,7 +1808,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                 className="inline-block w-2 h-2 rounded-full animate-pulse"
                 style={{ background: 'var(--color-accent)' }}
               />
-              Running{elapsedMs > 0 ? ` · ${(elapsedMs / 1000).toFixed(1)}s` : ''}
+              Em execução{elapsedMs > 0 ? ` · ${(elapsedMs / 1000).toFixed(1)}s` : ''}
             </>
           ) : (
             <>
@@ -1834,7 +1833,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
       >
         {question && (
           <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            <span style={{ color: 'var(--color-text-secondary)' }}>Question:</span> {question}
+            <span style={{ color: 'var(--color-text-secondary)' }}>Pergunta:</span> {question}
           </div>
         )}
 
@@ -1899,7 +1898,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                 }}
               >
                 <div className="text-xs mb-1" style={{ color: 'var(--color-text-tertiary)' }}>
-                  Result
+                  Resultado
                 </div>
                 <div className="prose prose-sm prose-invert max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{findings}</ReactMarkdown>
@@ -1911,7 +1910,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
                   className="text-sm text-center py-8"
                   style={{ color: 'var(--color-text-tertiary)' }}
                 >
-                  No runs yet. Ask a question below to run the agent.
+                  Nenhuma execução ainda. Faça uma pergunta abaixo para executar o agente.
                 </div>
               )
             )}
@@ -1943,7 +1942,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
         />
         <div className="flex items-center justify-between mt-2">
           <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            Sends your question as an ad-hoc run — results appear in the trace above.
+            Envia sua pergunta como uma execução avulsa. Os resultados aparecem no rastreamento acima.
           </span>
           <button
             onClick={handleAsk}
@@ -1956,7 +1955,7 @@ function InteractTab({ agentId, agentStatus, onRunStateChange }: { agentId: stri
             }}
           >
             {isBusy ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-            {isBusy ? 'Running' : 'Ask'}
+            {isBusy ? "Em execução" : 'Ask'}
           </button>
         </div>
       </div>
@@ -2042,7 +2041,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
         color: 'var(--color-text-secondary)',
         fontSize: 12, marginBottom: 12,
       }}>
-        Data sources your agent can search across
+        Fontes de dados que o agente pode consultar
       </div>
 
       {/* Connected sources grid */}
@@ -2092,7 +2091,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     borderRadius: 4, cursor: 'pointer',
                   }}
                 >
-                  {isReconnecting ? 'Cancel' : 'Reconnect'}
+                  {isReconnecting ? "Cancelar" : 'Reconnect'}
                 </button>
               </div>
               {isReconnecting && meta?.steps && (
@@ -2104,7 +2103,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     fontSize: 12, color: 'var(--color-warning)',
                     marginBottom: 8,
                   }}>
-                    Re-enter credentials to reconnect this source.
+                    Digite as credenciais novamente para reconectar esta fonte.
                   </div>
                   {meta.steps.map((step, i) => (
                     <div
@@ -2120,7 +2119,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                         color: 'var(--color-accent-purple)', fontSize: 10,
                         fontWeight: 600, marginBottom: 3,
                       }}>
-                        STEP {i + 1}
+                        ETAPA {i + 1}
                       </div>
                       <div style={{ fontSize: 12, marginBottom: step.url ? 4 : 0 }}>
                         {step.label}
@@ -2195,7 +2194,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                     </div>
                     <div style={{ fontSize: 12,
                       color: 'var(--color-text-secondary)' }}>
-                      Not connected
+                      Não conectado
                     </div>
                   </div>
                   <span style={{
@@ -2225,7 +2224,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                           color: 'var(--color-accent-purple)', fontSize: 10,
                           fontWeight: 600, marginBottom: 3,
                         }}>
-                          STEP {i + 1}
+                          ETAPA {i + 1}
                         </div>
                         <div style={{
                           fontSize: 12, marginBottom: step.url ? 4 : 0,
@@ -2260,7 +2259,7 @@ function ChannelsTab({ agentId }: { agentId: string }) {
                       fontSize: 10, color: 'var(--color-text-secondary)',
                       textAlign: 'center', marginTop: 8,
                     }}>
-                      {'\uD83D\uDD12'} Read-only access {'\u00B7'} No data leaves your device
+                      {'\uD83D\uDD12'} Acesso somente para leitura {'\u00B7'} Os dados permanecem no seu dispositivo
                     </div>
                   </div>
                 )}
@@ -2334,7 +2333,7 @@ function InlineConnectForm({
           borderRadius: 6, fontSize: 12, cursor: 'pointer',
         }}
       >
-        {loading ? 'Connecting...' : 'Connect'}
+        {loading ? "Conectando..." : "Conectar"}
       </button>
     </div>
   );
@@ -2440,9 +2439,9 @@ function SendBlueWebhookStep({
           borderRadius: 6,
           borderLeft: '3px solid var(--color-accent, var(--color-accent-purple))',
         }}>
-          <div><strong>1.</strong> Open a terminal and run: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
-          <div style={{ marginTop: 4 }}><strong>2.</strong> Copy the <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL</div>
-          <div style={{ marginTop: 4 }}><strong>3.</strong> Paste it below and click "Register Webhook"</div>
+          <div><strong>1.</strong> Abra um terminal e execute: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
+          <div style={{ marginTop: 4 }}><strong>2.</strong> Copie a <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL</div>
+          <div style={{ marginTop: 4 }}><strong>3.</strong> Cole abaixo e clique em “Registrar webhook”</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           <input
@@ -2468,22 +2467,22 @@ function SendBlueWebhookStep({
           >
             {webhookStatus === 'registering' ? 'Registering...'
               : webhookStatus === 'done' ? 'Registered!'
-              : webhookStatus === 'error' ? 'Retry'
+              : webhookStatus === 'error' ? "Tentar novamente"
               : 'Register Webhook'}
           </button>
         </div>
         {webhookStatus === 'done' && (
           <div style={{ fontSize: 11, color: 'var(--color-success)', marginTop: 6 }}>
-            Webhook registered! Incoming texts will be forwarded to your agent.
+            Webhook registrado! As mensagens recebidas serão encaminhadas ao agente.
           </div>
         )}
         {webhookStatus === 'error' && (
           <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 6 }}>
-            Failed to register. Check your ngrok URL and try again.
+            Falha no registro. Verifique a URL do ngrok e tente novamente.
           </div>
         )}
         <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 8 }}>
-          Don't have ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Download it free</a>
+          Não tem o ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Baixe gratuitamente</a>
         </div>
       </div>
     </div>
@@ -2656,9 +2655,9 @@ function SendBlueWizard({
               background: healthy ? 'color-mix(in srgb, var(--color-success) 22%, transparent)' : 'color-mix(in srgb, var(--color-warning) 18%, var(--color-bg))',
               color: healthy ? 'var(--color-success)' : 'var(--color-warning)',
               padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 600,
-            }}>{healthy ? 'Active' : 'Disconnected'}</span>
+            }}>{healthy ? "Ativo" : "Desconectado"}</span>
             <button onClick={() => setExpanded(true)} style={btnSecondary}>
-              Details
+              Detalhes
             </button>
           </div>
         </div>
@@ -2678,7 +2677,7 @@ function SendBlueWizard({
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setExpanded(false)} style={btnSecondary}>Collapse</button>
-            <button onClick={() => onRemove(binding!.id)} style={{ ...btnSecondary, color: 'var(--color-error)' }}>Remove</button>
+            <button onClick={() => onRemove(binding!.id)} style={{ ...btnSecondary, color: 'var(--color-error)' }}>Remover</button>
           </div>
         </div>
         <div style={{ borderTop: '1px solid var(--color-border)', padding: 14, background: 'var(--color-bg)' }}>
@@ -2688,13 +2687,13 @@ function SendBlueWizard({
           </div>
 
           <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 8, fontWeight: 600 }}>
-            Send a test message
+            Enviar mensagem de teste
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
               value={testNumber}
               onChange={(e) => { setTestNumber(e.target.value); setTestSent(false); }}
-              placeholder="Your phone number (+1...)"
+              placeholder="Seu número de telefone (+55...)"
               style={{ ...inputStyle, flex: 1 }}
             />
             <button
@@ -2730,7 +2729,7 @@ function SendBlueWizard({
           onClick={(e) => { e.stopPropagation(); setStep(step === 'idle' ? 'creds' : 'idle'); }}
           style={{ fontSize: 10, padding: '3px 12px', background: 'var(--color-accent-purple)', color: 'var(--color-on-accent)', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}
         >
-          {step === 'idle' ? 'Set Up' : 'Cancel'}
+          {step === 'idle' ? 'Set Up' : "Cancelar"}
         </button>
       </div>
 
@@ -2853,7 +2852,7 @@ function SendBlueWizard({
             disabled={step === 'connecting' || !selectedNumber.trim()}
             style={{ ...btnPrimary, opacity: !selectedNumber.trim() ? 0.5 : 1 }}
           >
-            {step === 'connecting' ? 'Connecting...' : 'Activate Phone Number'}
+            {step === 'connecting' ? "Conectando..." : 'Activate Phone Number'}
           </button>
         </div>
       )}
@@ -2945,7 +2944,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
         textTransform: 'uppercase', letterSpacing: 1,
         margin: '14px 0 8px', fontWeight: 600,
       }}>
-        Other messaging channels
+        Outros canais de mensagens
       </div>
 
       {MESSAGING_CHANNELS.map((ch) => {
@@ -2991,7 +2990,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     background: 'color-mix(in srgb, var(--color-success) 22%, transparent)', color: 'var(--color-success)',
                     padding: '2px 8px', borderRadius: 10,
                     fontSize: 10, fontWeight: 600,
-                  }}>Active</span>
+                  }}>Ativo</span>
                   <button
                     onClick={() => handleRemove(binding.id)}
                     style={{
@@ -3001,7 +3000,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                       border: '1px solid var(--color-border)',
                       borderRadius: 4, cursor: 'pointer',
                     }}
-                  >Remove</button>
+                  >Remover</button>
                 </div>
               ) : (
                 <button
@@ -3016,7 +3015,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     cursor: 'pointer', fontWeight: 600,
                   }}
                 >
-                  {isSetup ? 'Cancel' : 'Set Up'}
+                  {isSetup ? "Cancelar" : 'Set Up'}
                 </button>
               )}
             </div>
@@ -3079,7 +3078,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                                 border: 'none', borderRadius: 3,
                                 cursor: 'pointer', fontWeight: 600,
                               }}
-                            >Copy</button>
+                            >Copiar</button>
                           </div>
                         </div>
                       );
@@ -3125,7 +3124,7 @@ function MessagingTab({ agentId }: { agentId: string }) {
                     marginTop: 4,
                   }}
                 >
-                  {loading ? 'Connecting...' : 'Connect'}
+                  {loading ? "Conectando..." : "Conectar"}
                 </button>
               </div>
             )}
@@ -3165,7 +3164,7 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Learning</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Aprendizado</span>
           <span
             className="text-xs px-2 py-0.5 rounded-full"
             style={{
@@ -3173,7 +3172,7 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
               color: learningEnabled ? 'var(--color-success)' : 'var(--color-text-tertiary)',
             }}
           >
-            {learningEnabled ? 'Enabled' : 'Disabled'}
+            {learningEnabled ? "Ativado" : "Desativado"}
           </span>
         </div>
         <button
@@ -3187,12 +3186,12 @@ function LearningTab({ agentId, learningEnabled }: { agentId: string; learningEn
           }}
         >
           <RefreshCw size={12} className={triggering ? 'animate-spin' : ''} />
-          Run Learning
+          Executar aprendizado
         </button>
       </div>
       {logs.length === 0 ? (
         <div className="text-sm text-center py-8" style={{ color: 'var(--color-text-tertiary)' }}>
-          No learning events yet. Run the agent or trigger learning manually.
+          Nenhum evento de aprendizado ainda. Execute o agente ou inicie o aprendizado manualmente.
         </div>
       ) : (
         <div className="space-y-2">
@@ -3286,7 +3285,7 @@ function LogsTab({ agentId }: { agentId: string }) {
     if (eventType === 'query_complete') return 'Complete';
     if (eventType === 'tool_call') return 'Tool Call';
     if (eventType === 'tool_result') return 'Tool Result';
-    if (eventType === 'query_error') return 'Error';
+    if (eventType === 'query_error') return "Erro";
     return eventType;
   };
 
@@ -3294,15 +3293,15 @@ function LogsTab({ agentId }: { agentId: string }) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-          Activity Log
+          Registro de atividades
         </span>
         <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-          {timeline.length} entr{timeline.length !== 1 ? 'ies' : 'y'} (auto-refreshing)
+          {timeline.length} entr{timeline.length !== 1 ? 'ies' : 'y'} (atualização automática)
         </span>
       </div>
       {timeline.length === 0 ? (
         <div className="text-sm text-center py-8" style={{ color: 'var(--color-text-tertiary)' }}>
-          No activity yet. Send a message or run the agent to generate logs.
+          Nenhuma atividade ainda. Envie uma mensagem ou execute o agente para gerar registros.
         </div>
       ) : (
         <div className="space-y-2">
@@ -3368,7 +3367,7 @@ function LogsTab({ agentId }: { agentId: string }) {
                       className="text-[10px] px-1.5 py-0.5 rounded font-medium"
                       style={{ background: 'var(--color-bg)', color: 'var(--color-text-secondary)' }}
                     >
-                      Trace
+                      Rastreamento
                     </span>
                     {errorDetail && (
                       <span
@@ -3390,16 +3389,16 @@ function LogsTab({ agentId }: { agentId: string }) {
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
                   <span>{t.duration.toFixed(1)}s</span>
-                  <span>{t.steps} step{t.steps !== 1 ? 's' : ''}</span>
+                  <span>{t.steps} etapa{t.steps !== 1 ? 's' : ''}</span>
                 </div>
                 {isExpanded && errorDetail && (
                   <div className="mt-2 pt-2 space-y-1.5 text-xs" style={{ borderTop: '1px solid var(--color-border)' }}>
                     <div>
-                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Error: </span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Erro: </span>
                       <span style={{ color: 'var(--color-text)' }}>{errorDetail.error_message}</span>
                     </div>
                     <div>
-                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Action: </span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>Ação: </span>
                       <span style={{ color: 'var(--color-text)' }}>{errorDetail.suggested_action}</span>
                     </div>
                   </div>
@@ -3548,7 +3547,7 @@ export function AgentsPage() {
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center" style={{ color: 'var(--color-text-tertiary)' }}>
-        Loading agents...
+        Carregando agentes...
       </div>
     );
   }
@@ -3563,13 +3562,13 @@ export function AgentsPage() {
 
     const DETAIL_TABS = [
       { id: 'interact', label: 'Interact', icon: MessageSquare },
-      { id: 'overview', label: 'Overview', icon: Activity },
-      { id: 'channels', label: 'Data Sources', icon: Database },
-      { id: 'messaging', label: 'Messaging Channels', icon: Wifi },
+      { id: 'overview', label: "Visão geral", icon: Activity },
+      { id: 'channels', label: "Fontes de dados", icon: Database },
+      { id: 'messaging', label: "Canais de mensagens", icon: Wifi },
       { id: 'tasks', label: 'Tasks', icon: ListTodo },
-      { id: 'memory', label: 'Memory', icon: Brain },
-      { id: 'learning', label: 'Learning', icon: Settings },
-      { id: 'logs', label: 'Logs', icon: FileText },
+      { id: 'memory', label: "Memória", icon: Brain },
+      { id: 'learning', label: "Aprendizado", icon: Settings },
+      { id: 'logs', label: "Registros", icon: FileText },
     ] as const;
 
     return (
@@ -3581,7 +3580,7 @@ export function AgentsPage() {
           className="flex items-center gap-1 mb-4 text-sm cursor-pointer"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          <ChevronLeft size={16} /> Back to agents
+          <ChevronLeft size={16} /> Voltar aos agentes
         </button>
 
         {/* Header */}
@@ -3607,7 +3606,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs"
                 style={{ background: 'var(--color-success)20', color: 'var(--color-success)', border: '1px solid var(--color-success)40' }}
               >
-                <MessageSquare size={13} /> Chat ready — just type below
+                <MessageSquare size={13} /> Conversa pronta — digite abaixo
               </span>
             ) : (
               <button
@@ -3615,7 +3614,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer font-medium"
                 style={{ background: 'var(--color-accent)', color: 'var(--color-on-accent)' }}
               >
-                <Zap size={13} /> Run Now
+                <Zap size={13} /> Executar agora
               </button>
             )}
             {(selectedAgent.status === 'running' || selectedAgent.status === 'idle') && (
@@ -3624,7 +3623,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               >
-                <Pause size={13} /> Pause
+                <Pause size={13} /> Pausar
               </button>
             )}
             {selectedAgent.status === 'paused' && (
@@ -3633,7 +3632,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-success)20', color: 'var(--color-success)', border: '1px solid var(--color-success)40' }}
               >
-                <Play size={13} /> Resume
+                <Play size={13} /> Retomar
               </button>
             )}
             {(selectedAgent.status === 'error' || selectedAgent.status === 'stalled' || selectedAgent.status === 'needs_attention') && (
@@ -3642,7 +3641,7 @@ export function AgentsPage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm cursor-pointer"
                 style={{ background: 'var(--color-error)20', color: 'var(--color-error)', border: '1px solid var(--color-error)40' }}
               >
-                <AlertTriangle size={13} /> Recover
+                <AlertTriangle size={13} /> Recuperar
               </button>
             )}
             <button
@@ -3655,7 +3654,7 @@ export function AgentsPage() {
               }}
               className="p-1.5 rounded-lg cursor-pointer transition-colors"
               style={{ color: 'var(--color-error)', background: 'var(--color-error)15' }}
-              title="Delete agent"
+              title="Excluir agente"
             >
               <Trash2 size={15} />
             </button>
@@ -3693,7 +3692,7 @@ export function AgentsPage() {
               style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
             >
               <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
-                Configuration
+                Configuração
               </h3>
               <AgentConfigGrid agent={selectedAgent} onAgentUpdated={refresh} />
               <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
@@ -3714,19 +3713,19 @@ export function AgentsPage() {
               >
                 <Database size={16} style={{ color: 'var(--color-accent)', flexShrink: 0, marginTop: 2 }} />
                 <div style={{ color: 'var(--color-text-secondary)' }}>
-                  <strong>Tip:</strong> Connect your personal data in the{' '}
+                  <strong>Dica:</strong> Conecte seus dados pessoais na aba{' '}
                   <button
                     onClick={() => setDetailTab('channels')}
                     className="cursor-pointer underline"
                     style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
-                  >Data Sources</button>{' '}
-                  tab, then set up{' '}
+                  >Fontes de dados</button>{' '}
+                  e configure{' '}
                   <button
                     onClick={() => setDetailTab('messaging')}
                     className="cursor-pointer underline"
                     style={{ color: 'var(--color-accent)', background: 'none', border: 'none', padding: 0, font: 'inherit' }}
-                  >Messaging Channels</button>{' '}
-                  to talk to this agent from your phone.
+                  >Canais de mensagens</button>{' '}
+                  para conversar com este agente pelo celular.
                 </div>
               </div>
             )}
@@ -3754,19 +3753,19 @@ export function AgentsPage() {
                   <div className="flex gap-0 flex-wrap items-stretch">
                     {/* Agent Statistics */}
                     <div className="pr-5">
-                      <p style={sectionTitle}>Agent Statistics</p>
+                      <p style={sectionTitle}>Estatísticas do agente</p>
                       <div className="flex gap-5">
                         <div>
                           <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{selectedAgent.total_runs ?? 0}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Total Queries</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Total de consultas</p>
                         </div>
                         <div>
                           <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{inTok.toLocaleString()}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Input Tokens</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Tokens de entrada</p>
                         </div>
                         <div>
                           <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-text)' }}>{outTok.toLocaleString()}</p>
-                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Output Tokens</p>
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Tokens de saída</p>
                         </div>
                       </div>
                     </div>
@@ -3774,22 +3773,22 @@ export function AgentsPage() {
                       <div style={{ width: 1, background: 'var(--color-border)' }} />
                       {/* Local Utilization */}
                       <div className="px-5">
-                        <p style={sectionTitle}>Local Utilization</p>
+                        <p style={sectionTitle}>Utilização local</p>
                         <div className="flex gap-5">
                           <div>
                             <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-success)' }}>{fmtFlops}</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Compute</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Processamento</p>
                           </div>
                           <div>
                             <p className="text-xl font-bold leading-none" style={{ color: 'var(--color-success)' }}>{energyKj.toFixed(2)} kJ</p>
-                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Energy</p>
+                            <p className="text-xs mt-1" style={{ color: 'var(--color-text-tertiary)' }}>Energia</p>
                           </div>
                         </div>
                       </div>
                       <div style={{ width: 1, background: 'var(--color-border)' }} />
                       {/* Dollars Saved */}
                       <div className="pl-5">
-                        <p style={sectionTitle}>Dollars Saved vs.</p>
+                        <p style={sectionTitle}>Dólares economizados em relação a</p>
                         <div className="flex gap-5">
                           {providers.map((p) => {
                             const cost = (inTok / 1e6) * p.inPer1M + (outTok / 1e6) * p.outPer1M;
@@ -3814,7 +3813,7 @@ export function AgentsPage() {
                 style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
               >
                 <h3 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
-                  Messaging Channels
+                  Canais de mensagens
                 </h3>
                 {channels.map((b) => (
                   <div key={b.id} className="text-sm py-1" style={{ color: 'var(--color-text)' }}>
@@ -3866,7 +3865,7 @@ export function AgentsPage() {
             ))}
             {tasks.length === 0 && (
               <div className="text-sm py-8 text-center" style={{ color: 'var(--color-text-tertiary)' }}>
-                No tasks assigned.
+                Nenhuma tarefa atribuída.
               </div>
             )}
           </div>
@@ -3879,7 +3878,7 @@ export function AgentsPage() {
             style={{ background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)' }}
           >
             <h3 className="text-sm font-medium mb-3 flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
-              <Brain size={14} /> Summary Memory
+              <Brain size={14} /> Memória resumida
             </h3>
             <p className="whitespace-pre-wrap text-sm" style={{ color: 'var(--color-text)' }}>
               {selectedAgent.summary_memory || 'Agent has no stored memory yet.'}
@@ -3921,7 +3920,7 @@ export function AgentsPage() {
       <header className="mb-6">
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-            Agents
+            Agentes
           </h1>
           <button
             onClick={() => agentManagerAvailable && setShowWizard(true)}
@@ -3932,11 +3931,11 @@ export function AgentsPage() {
               color: agentManagerAvailable === false ? 'var(--color-text-tertiary)' : 'var(--color-on-accent)',
             }}
           >
-            <Plus size={15} /> New Agent
+            <Plus size={15} /> Novo agente
           </button>
         </div>
         <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-          Long-running autonomous agents that can monitor sources, run tasks on a schedule, and message you through connected channels.
+          Agentes autônomos que podem monitorar fontes, executar tarefas agendadas e enviar mensagens pelos canais conectados.
         </p>
       </header>
 
@@ -3950,7 +3949,7 @@ export function AgentsPage() {
           }}
         >
           <AlertTriangle size={16} />
-          <span>Agent manager is not enabled. Set <code className="font-mono text-xs">agent_manager.enabled = true</code> in your config.</span>
+          <span>O gerenciador de agentes não está ativado. Defina <code className="font-mono text-xs">agent_manager.enabled = true</code> na sua configuração.</span>
         </div>
       )}
 
@@ -3985,9 +3984,9 @@ export function AgentsPage() {
         <div className="text-center py-16" style={{ color: 'var(--color-text-tertiary)' }}>
           <Bot size={48} className="mx-auto mb-4 opacity-30" />
           <p className="mb-2 font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-            No agents yet
+            Nenhum agente ainda
           </p>
-          <p className="text-sm mb-6">Create your first agent to get started with autonomous task management.</p>
+          <p className="text-sm mb-6">Crie seu primeiro agente para começar a gerenciar tarefas autônomas.</p>
           <button
             onClick={() => agentManagerAvailable && setShowWizard(true)}
             disabled={agentManagerAvailable === false}
@@ -3997,7 +3996,7 @@ export function AgentsPage() {
               color: agentManagerAvailable === false ? 'var(--color-text-tertiary)' : 'var(--color-on-accent)',
             }}
           >
-            <Plus size={15} /> Launch your first agent
+            <Plus size={15} /> Iniciar seu primeiro agente
           </button>
         </div>
       )}

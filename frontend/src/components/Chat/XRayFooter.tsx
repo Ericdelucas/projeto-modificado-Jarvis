@@ -20,7 +20,7 @@ export function XRayFooter({ usage, telemetry, isResearch = false }: Props) {
   // produced the answer) and label the response with the mode instead.
   const parts: string[] = [];
   if (isResearch) {
-    parts.push('Deep Research');
+    parts.push("Pesquisa aprofundada");
   } else {
     if (telemetry?.engine) parts.push(telemetry.engine);
     if (telemetry?.model_id) parts.push(telemetry.model_id);
@@ -40,7 +40,7 @@ export function XRayFooter({ usage, telemetry, isResearch = false }: Props) {
   // Build expanded rows
   const rows: Array<{ label: string; value: string; color?: string }> = [];
   if (isResearch) {
-    rows.push({ label: 'Mode', value: 'Deep Research' });
+    rows.push({ label: 'Mode', value: "Pesquisa aprofundada" });
   } else if (telemetry?.engine) {
     const modelDetail = telemetry.model_id || '';
     rows.push({ label: 'Engine', value: `${telemetry.engine}${modelDetail ? ` (${modelDetail})` : ''}` });
@@ -58,7 +58,7 @@ export function XRayFooter({ usage, telemetry, isResearch = false }: Props) {
         tokenParts.push(`~${thinking} thinking`);
       }
     }
-    rows.push({ label: 'Tokens', value: tokenParts.join(' \u00B7 ') });
+    rows.push({ label: "Tokens", value: tokenParts.join(' \u00B7 ') });
   }
   if (telemetry?.complexity_tier) {
     rows.push({
@@ -76,7 +76,7 @@ export function XRayFooter({ usage, telemetry, isResearch = false }: Props) {
     const latencyParts: string[] = [];
     if (telemetry.ttft_ms != null) latencyParts.push(`TTFT ${formatMs(telemetry.ttft_ms)}`);
     if (telemetry.total_ms != null) latencyParts.push(`Total ${formatMs(telemetry.total_ms)}`);
-    rows.push({ label: 'Latency', value: latencyParts.join(' \u00B7 ') });
+    rows.push({ label: "Latência", value: latencyParts.join(' \u00B7 ') });
   }
 
   return (

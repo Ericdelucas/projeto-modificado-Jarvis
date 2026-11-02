@@ -31,8 +31,8 @@ describe('connector lifecycle status', () => {
   it('renders pending cleanup without a competing sync action', () => {
     const html = renderStatus({ ...baseStatus, state: 'stopping' });
 
-    expect(html).toContain('Disconnect pending');
-    expect(html).toContain('cleaned up before this source disconnects');
+    expect(html).toContain('Desconexão pendente');
+    expect(html).toContain('removidos antes de desconectar esta fonte');
     expect(html).not.toContain('<button');
   });
 

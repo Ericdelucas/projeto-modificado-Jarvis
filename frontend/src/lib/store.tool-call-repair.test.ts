@@ -66,7 +66,7 @@ describe('persisted tool calls', () => {
 
     const { useAppStore } = await import('./store');
 
-    expect(useAppStore.getState().messages[0].toolCalls?.[0].arguments).toBe(
+    expect(useAppStore.getState().conversations[0].messages[0].toolCalls?.[0].arguments).toBe(
       '{"query":"python"}',
     );
     const repaired = JSON.parse(localStorage.getItem(CONVERSATIONS_KEY) ?? '{}');
@@ -114,8 +114,8 @@ describe('persisted tool calls', () => {
 
     const { useAppStore } = await import('./store');
 
-    expect(useAppStore.getState().messages).toHaveLength(1);
-    expect(useAppStore.getState().messages[0].toolCalls?.[0].arguments).toBe(
+    expect(useAppStore.getState().conversations[0].messages).toHaveLength(1);
+    expect(useAppStore.getState().conversations[0].messages[0].toolCalls?.[0].arguments).toBe(
       '{"query":"python"}',
     );
   });

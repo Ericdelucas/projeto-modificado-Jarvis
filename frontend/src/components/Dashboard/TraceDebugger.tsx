@@ -62,7 +62,7 @@ function TraceCard({ trace, isActive, onClick }: { trace: TraceSummary; isActive
         {trace.query || 'Untitled query'}
       </div>
       <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
-        <span>{trace.steps.length} steps</span>
+        <span>{trace.steps.length} etapas</span>
         <span>&middot;</span>
         <span>{totalMs.toFixed(0)}ms</span>
         <span>&middot;</span>
@@ -146,7 +146,7 @@ export function TraceDebugger() {
       <div className="hud-panel p-6">
         <h3 className="hud-label flex items-center gap-2 mb-4">
           <GitBranch size={12} style={{ color: 'var(--color-accent)' }} />
-          Trace Debugger
+          Depurador de rastreamento
         </h3>
         <div className="h-48 flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
           <span className="hud-mono">{error}</span>
@@ -159,12 +159,12 @@ export function TraceDebugger() {
     <div className="hud-panel p-6">
       <h3 className="hud-label flex items-center gap-2 mb-4">
         <GitBranch size={12} style={{ color: 'var(--color-accent)' }} />
-        Trace Debugger
+        Depurador de rastreamento
       </h3>
 
       {traces.length === 0 ? (
         <div className="h-48 flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-          No traces yet. Start making queries to see them here.
+          Nenhum rastreamento ainda. Faça perguntas para vê-los aqui.
         </div>
       ) : (
         <div className="flex gap-4 h-80">
@@ -193,7 +193,7 @@ export function TraceDebugger() {
               </div>
             ) : (
               <div className="h-full flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-                Select a trace to view details
+                Selecione um rastreamento para ver os detalhes
               </div>
             )}
           </div>

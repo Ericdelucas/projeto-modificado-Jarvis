@@ -275,6 +275,17 @@ export async function fetchServerInfo(): Promise<ServerInfo> {
   return res.json();
 }
 
+export interface SystemLoad {
+  cpu_percent: number;
+  gpu: { name: string; percent: number } | null;
+}
+
+export async function fetchSystemLoad(): Promise<SystemLoad> {
+  const res = await apiFetch(`/v1/system/load`);
+  if (!res.ok) throw new Error(`Failed to fetch system load: ${res.status}`);
+  return res.json();
+}
+
 export async function checkHealth(): Promise<boolean> {
   if (isTauri()) {
     try {
@@ -362,7 +373,7 @@ export interface SpeechHealth {
   reason?: string;
 }
 
-export async function transcribeAudio(audioBlob: Blob, filename = 'recording.webm'): Promise<TranscriptionResult> {
+export async function transcribeAudio(audioBlob: Blob, filename = 'recording.webm', language = 'pt'): Promise<TranscriptionResult> {
   if (isTauri()) {
     try {
       const buffer = await audioBlob.arrayBuffer();
@@ -377,9 +388,11 @@ export async function transcribeAudio(audioBlob: Blob, filename = 'recording.web
   }
   const formData = new FormData();
   formData.append('file', audioBlob, filename);
+  formData.append('language', language);
   const res = await apiFetch(`/v1/speech/transcribe`, {
     method: 'POST',
     body: formData,
+    signal: AbortSignal.timeout(45_000),
   });
   if (!res.ok) {
     let detail = "";
@@ -406,7 +419,7 @@ export async function synthesizeSpeech(
   text: string,
   opts: { voiceId?: string; speed?: number; signal?: AbortSignal } = {},
 ): Promise<Blob> {
-  const res = await apiFetch(`/v1/speech/synthesize`, {
+  const res = await apiFetch(`/api/tts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, voice_id: opts.voiceId, speed: opts.speed }),
@@ -426,7 +439,7 @@ export async function synthesizeSpeech(
 }
 
 export async function fetchTtsHealth(): Promise<TtsHealth> {
-  const res = await apiFetch(`/v1/speech/tts/health`);
+  const res = await apiFetch(`/api/tts/health`);
   if (!res.ok) return { available: false };
   return res.json();
 }

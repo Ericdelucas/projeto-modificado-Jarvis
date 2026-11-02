@@ -10,19 +10,10 @@ import { initAnalytics } from './lib/analytics';
 import './index.css';
 
 function applyTheme() {
-  try {
-    const raw = localStorage.getItem('openjarvis-settings');
-    const settings = raw ? JSON.parse(raw) : {};
-    const theme = settings.theme || 'system';
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    } else if (theme === 'light') {
-      document.documentElement.classList.add('light');
-      document.documentElement.classList.remove('dark');
-    }
-  } catch { /* use system default */ }
+  document.documentElement.classList.remove('light');
+  document.documentElement.classList.add('dark');
 }
+
 
 applyTheme();
 
@@ -44,3 +35,10 @@ initApiBase().finally(() => {
     </StrictMode>,
   );
 });
+
+// A development HUD must not be hidden behind an old production PWA shell.
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  void navigator.serviceWorker.getRegistrations().then(registrations => {
+    for (const registration of registrations) void registration.unregister();
+  });
+}

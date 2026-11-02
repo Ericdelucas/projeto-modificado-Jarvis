@@ -1004,12 +1004,21 @@ async def transcribe_speech(request: Request):
 
     audio_bytes = await audio_file.read()
     language = form.get("language")
+    if not language:
+        config = getattr(request.app.state, "config", None)
+        language = getattr(getattr(config, "speech", None), "language", "")
+    if isinstance(language, str):
+        language = language.replace("_", "-").split("-")[0].lower()
 
     # Detect format from filename
     filename = getattr(audio_file, "filename", "audio.wav")
     ext = filename.rsplit(".", 1)[-1] if "." in filename else "wav"
 
     try:
+        logger.info(
+            "Speech upload: bytes=%d format=%s language=%s",
+            len(audio_bytes), ext, language,
+        )
         result = await asyncio.to_thread(
             backend.transcribe,
             audio_bytes,
@@ -1023,6 +1032,12 @@ async def transcribe_speech(request: Request):
             detail=f"Speech transcription failed: {exc}",
         ) from exc
 
+    logger.info(
+        "Speech result: duration=%.2fs characters=%d",
+        result.duration_seconds or 0, len(result.text.strip()),
+    )
+    if not result.text.strip():
+        logger.warning("Speech returned no text; check microphone and speech level")
     return {
         "text": result.text,
         "language": result.language,
@@ -1306,6 +1321,26 @@ def include_all_routes(app) -> None:
     app.include_router(websocket_router)
     app.include_router(learning_router)
     app.include_router(speech_router)
+    from openjarvis.server.tts_routes import router as edge_tts_router
+
+    app.include_router(edge_tts_router)
+    from openjarvis.server.wakeword_routes import router as wakeword_router
+    from openjarvis.speech.wakeword import WakeWordService
+
+    speech = getattr(getattr(app.state, "config", None), "speech", None)
+    app.state.wakeword_service = (
+        WakeWordService(
+            threshold=speech.wake_threshold, stable_frames=speech.wake_stable_frames
+        )
+        if speech is not None
+        else WakeWordService()
+    )
+    app.include_router(wakeword_router)
+
+    @app.on_event("shutdown")
+    async def stop_wakeword():
+        await asyncio.to_thread(app.state.wakeword_service.stop)
+
     app.include_router(feedback_router)
     app.include_router(optimize_router)
 

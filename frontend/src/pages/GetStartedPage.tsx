@@ -121,7 +121,7 @@ function CodeBlock({ code }: { code: string }) {
         onClick={handleCopy}
         className="absolute top-2 right-2 p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
         style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-tertiary)' }}
-        title="Copy"
+        title="Copiar"
       >
         {copied ? <Check size={14} /> : <Copy size={14} />}
       </button>
@@ -205,15 +205,14 @@ function HostedView() {
         className="text-sm mb-6 leading-relaxed max-w-md mx-auto"
         style={{ color: 'var(--color-text-secondary)' }}
       >
-        Private AI that runs on your hardware. Chat, tools, agents, and
-        energy profiling &mdash; no cloud required.
+        IA privada que funciona no seu computador. Conversas, ferramentas, agentes e métricas de energia, sem precisar da nuvem.
       </p>
 
       {healthy === true && (
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-accent)' }}>
             <CheckCircle2 size={16} />
-            <span>Server is running</span>
+            <span>O servidor está em execução</span>
           </div>
           <button
             onClick={() => navigate('/')}
@@ -223,7 +222,7 @@ function HostedView() {
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             <MessageSquare size={18} />
-            Start Chatting
+            Começar a conversar
             <ArrowRight size={16} />
           </button>
         </div>
@@ -234,13 +233,13 @@ function HostedView() {
           className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
           style={{ background: 'color-mix(in srgb, var(--color-error) 10%, transparent)', color: 'var(--color-error)' }}
         >
-          Server is not responding. The backend may be starting up.
+          O servidor não está respondendo. Ele pode estar iniciando.
         </div>
       )}
 
       {healthy === null && (
         <div className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-          Checking server...
+          Verificando servidor...
         </div>
       )}
     </div>
@@ -269,8 +268,7 @@ function DesktopView() {
           className="text-sm mb-4 leading-relaxed max-w-md mx-auto"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          Your local AI is ready. Everything runs on your device &mdash; no
-          data leaves your machine.
+          Sua IA local está pronta. O processamento ocorre no seu dispositivo.
         </p>
         <span
           className="inline-block text-[11px] font-mono px-2.5 py-1 rounded-full"
@@ -286,10 +284,10 @@ function DesktopView() {
       >
         <div className="flex items-center justify-center gap-2 mb-2" style={{ color: 'var(--color-accent)' }}>
           <CheckCircle2 size={18} />
-          <span className="text-sm font-medium">All systems running</span>
+          <span className="text-sm font-medium">Todos os sistemas em execução</span>
         </div>
         <p className="text-xs mb-5" style={{ color: 'var(--color-text-tertiary)' }}>
-          Ollama inference engine, API server, and AI model are active.
+          O motor Ollama, o servidor da API e o modelo de IA estão ativos.
         </p>
         <button
           onClick={() => navigate('/')}
@@ -299,17 +297,17 @@ function DesktopView() {
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
         >
           <MessageSquare size={18} />
-          Start Chatting
+          Começar a conversar
           <ArrowRight size={16} />
         </button>
       </div>
 
       <div className="flex flex-col gap-3 mb-8">
-        <Section icon={Cpu} title="Keyboard Shortcuts" defaultOpen>
+        <Section icon={Cpu} title="Atalhos de teclado" defaultOpen>
           <div className="grid grid-cols-2 gap-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+K</kbd> Model picker</div>
-            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+I</kbd> System panel</div>
-            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+N</kbd> New chat</div>
+            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+K</kbd> Seletor de modelo</div>
+            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+I</kbd> Painel do sistema</div>
+            <div><kbd className="font-mono px-1.5 py-0.5 rounded" style={{ background: 'var(--color-bg-tertiary)' }}>Cmd+N</kbd> Nova conversa</div>
           </div>
         </Section>
       </div>
@@ -342,8 +340,7 @@ function SelfHostedView() {
           className="text-sm mb-4 leading-relaxed max-w-md mx-auto"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          Private AI that runs on your hardware. Chat, tools, agents, and
-          energy profiling &mdash; no cloud required.
+          IA privada que funciona no seu computador. Conversas, ferramentas, agentes e métricas de energia, sem precisar da nuvem.
         </p>
         <span
           className="inline-block text-[11px] font-mono px-2.5 py-1 rounded-full"
@@ -362,11 +359,11 @@ function SelfHostedView() {
           <div className="flex items-center justify-center gap-2 mb-1">
             <Monitor size={18} style={{ color: 'var(--color-text-secondary)' }} />
             <h2 className="text-base font-semibold" style={{ color: 'var(--color-text)' }}>
-              Desktop App
+              Aplicativo para computador
             </h2>
           </div>
           <p className="text-xs mb-6" style={{ color: 'var(--color-text-tertiary)' }}>
-            One-click install. Bundles Ollama and the server &mdash; no setup required.
+            Instalação com um clique. Inclui Ollama e o servidor, sem configuração adicional.
           </p>
 
           <a
@@ -377,12 +374,12 @@ function SelfHostedView() {
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             <Download size={18} />
-            Download for {primary.label}
+            Baixar para {primary.label}
           </a>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
-              Or
+              Ou
             </span>
             {others.map((p) => (
               <a
@@ -402,36 +399,34 @@ function SelfHostedView() {
 
       {/* CLI + Browser sections */}
       <div className="flex flex-col gap-3 mb-10">
-        <Section icon={Terminal} title="Command Line (macOS / Linux)" defaultOpen>
+        <Section icon={Terminal} title="Linha de comando (macOS / Linux)" defaultOpen>
           <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            Clone and install (Python 3.10+ required):
+            Clone e instale (requer Python 3.10 ou superior):
           </p>
           <CodeBlock code={"git clone https://github.com/open-jarvis/OpenJarvis.git\ncd OpenJarvis\nuv sync"} />
           <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Then get started:
+            Depois, comece a usar:
           </p>
           <CodeBlock code={"jarvis init\njarvis doctor\njarvis chat"} />
         </Section>
 
-        <Section icon={Globe} title="Browser App (Self-Hosted)">
+        <Section icon={Globe} title="Aplicativo no navegador (hospedagem própria)">
           <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            Launch the API server to get the full UI in your browser:
+            Inicie o servidor da API para acessar a interface completa no navegador:
           </p>
           <CodeBlock code={"git clone https://github.com/open-jarvis/OpenJarvis.git\ncd OpenJarvis\nuv sync --extra desktop\njarvis serve --port 8000"} />
           <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            The chat, dashboard, energy profiling, and cost comparison all run
-            locally on your machine.
+            As conversas, o painel, as métricas de energia e a comparação de custos funcionam localmente no seu computador.
           </p>
         </Section>
 
-        <Section icon={Globe} title="Docker (Cloud / VPS Deploy)">
+        <Section icon={Globe} title="Docker (implantação na nuvem / VPS)">
           <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            Deploy with Docker Compose for a zero-setup hosted instance:
+            Use Docker Compose para implantar uma instância hospedada:
           </p>
           <CodeBlock code={"git clone https://github.com/open-jarvis/OpenJarvis.git\ncd OpenJarvis\ndocker compose -f deploy/docker/docker-compose.yml up -d"} />
           <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            This starts both the API server and Ollama. The web UI is bundled and
-            served automatically at port 8000.
+            Isso inicia o servidor da API e o Ollama. A interface web é incluída e disponibilizada automaticamente na porta 8000.
           </p>
         </Section>
       </div>
@@ -444,21 +439,21 @@ function SelfHostedView() {
         <div className="flex items-center gap-2 mb-3">
           <Cpu size={14} style={{ color: 'var(--color-text-tertiary)' }} />
           <h3 className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-tertiary)' }}>
-            System Requirements
+            Requisitos do sistema
           </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
           <div>
-            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>Desktop App</div>
-            No prerequisites &mdash; everything is bundled
+            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>Aplicativo para computador</div>
+            Sem pré-requisitos: tudo está incluído
           </div>
           <div>
-            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>CLI / Self-Hosted</div>
-            Python 3.10+ and an inference engine (Ollama recommended)
+            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>Linha de comando / hospedagem própria</div>
+            Python 3.10 ou superior e um motor de inferência (Ollama recomendado)
           </div>
           <div>
-            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>Memory</div>
-            8 GB+ RAM recommended
+            <div className="font-medium mb-0.5" style={{ color: 'var(--color-text)' }}>Memória</div>
+            Recomendado: pelo menos 8 GB de RAM
           </div>
         </div>
       </div>

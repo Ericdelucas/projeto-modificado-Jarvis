@@ -39,7 +39,7 @@ describe('first-run inference source navigation', () => {
     expect(html).toContain('several gigabytes');
     expect(html).toContain('Going back leaves Ollama stopped');
     expect(html).toContain('Use Ollama and continue');
-    expect(html).toContain('Back');
+    expect(html).toContain('Voltar');
   });
 
   it('requires endpoint coordinates and keeps an explicit cancel control', () => {
@@ -47,12 +47,12 @@ describe('first-run inference source navigation', () => {
       <CustomEndpointSetup onCancel={vi.fn()} onConfirm={vi.fn()} />,
     );
 
-    expect(html).toContain('Server URL');
+    expect(html).toContain('URL do servidor');
     expect(html).toContain('Model ID');
-    expect(html).toMatch(/aria-label="Server URL"[^>]*required/);
+    expect(html).toMatch(/aria-label="URL do servidor"[^>]*required/);
     expect(html).toMatch(/aria-label="Model ID"[^>]*required/);
     expect(html).toContain('Ollama will not start or download models');
-    expect(html).toContain('Cancel');
+    expect(html).toContain('Cancelar');
   });
 
   it('renders a source-change recovery action with a guarded busy state', () => {

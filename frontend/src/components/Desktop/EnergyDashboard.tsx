@@ -304,7 +304,7 @@ export function EnergyDashboard({ apiUrl }: { apiUrl: string }) {
       {/* Summary cards */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
-          <div style={styles.statLabel}>Total Energy</div>
+          <div style={styles.statLabel}>Energia total</div>
           <div style={styles.statValue}>
             {energyData?.total_energy_j !== undefined
               ? formatEnergy(energyData.total_energy_j)
@@ -349,7 +349,7 @@ export function EnergyDashboard({ apiUrl }: { apiUrl: string }) {
 
         {telemetry?.total_requests !== undefined && (
           <div style={styles.statCard}>
-            <div style={styles.statLabel}>Total Requests</div>
+            <div style={styles.statLabel}>Total de requisições</div>
             <div style={styles.statValue}>{telemetry.total_requests.toLocaleString()}</div>
           </div>
         )}

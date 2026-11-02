@@ -87,7 +87,7 @@ function TimelineStep({
           color: active ? 'var(--color-accent)' : 'var(--color-text-tertiary)',
         }}
       >
-        Search {index}
+        Buscar {index}
       </div>
 
       <div

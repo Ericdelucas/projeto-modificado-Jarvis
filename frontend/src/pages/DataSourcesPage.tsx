@@ -127,7 +127,7 @@ function InlineConnectForm({
           cursor: submitDisabled ? 'default' : 'pointer',
         }}
       >
-        Connect
+        Conectar
       </button>
     </div>
   );
@@ -186,7 +186,7 @@ function GenericConnectPanel({
       return (
         <div>
           <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-            Add one RSS or Atom feed URL per line.
+            Adicione uma URL de feed RSS ou Atom por linha.
           </div>
           <textarea
             value={feedUrls}
@@ -200,7 +200,7 @@ function GenericConnectPanel({
             disabled={loading || disabled || feeds.length === 0}
             style={{ width: '100%', padding: 8, background: loading || disabled || feeds.length === 0 ? 'var(--color-disabled-bg)' : 'var(--color-accent-purple)', color: 'var(--color-on-accent)', border: 'none', borderRadius: 6, fontSize: 12, cursor: loading || disabled || feeds.length === 0 ? 'default' : 'pointer' }}
           >
-            {loading ? 'Connecting...' : 'Save feeds'}
+            {loading ? "Conectando..." : 'Save feeds'}
           </button>
         </div>
       );
@@ -208,8 +208,7 @@ function GenericConnectPanel({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-          {displayName} reads data directly from this device. Grant access if
-          prompted, then connect.
+          {displayName} lê os dados diretamente deste dispositivo. Autorize o acesso se solicitado e depois conecte.
         </div>
         <button
           onClick={() => onConnect({})}
@@ -222,7 +221,7 @@ function GenericConnectPanel({
             cursor: loading || disabled ? 'default' : 'pointer',
           }}
         >
-          {loading ? 'Connecting...' : `Connect ${displayName}`}
+          {loading ? "Conectando..." : `Connect ${displayName}`}
         </button>
       </div>
     );
@@ -232,7 +231,7 @@ function GenericConnectPanel({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-          Enter your {displayName} API token.
+          Digite seu {displayName} token de API.
         </div>
         <InlineConnectForm
           fields={connectorId === 'weather'
@@ -268,7 +267,7 @@ function GenericConnectPanel({
             cursor: loading || disabled ? 'default' : 'pointer',
           }}
         >
-          {loading ? 'Connecting...' : `Continue with ${oauthSetup.provider || displayName}`}
+          {loading ? "Conectando..." : `Continue with ${oauthSetup.provider || displayName}`}
         </button>
       </div>
     );
@@ -283,7 +282,7 @@ function GenericConnectPanel({
           borderRadius: 6, padding: 10, marginBottom: 10,
         }}>
           <div style={{ color: 'var(--color-accent-purple)', fontSize: 10, fontWeight: 600, marginBottom: 3 }}>
-            SETUP REQUIRED
+            CONFIGURAÇÃO NECESSÁRIA
           </div>
           <div style={{ fontSize: 12, marginBottom: 6 }}>{oauthSetup.setup_hint}</div>
           <a
@@ -292,12 +291,12 @@ function GenericConnectPanel({
             rel="noopener noreferrer"
             style={{ color: 'var(--color-accent)', fontSize: 11, textDecoration: 'underline' }}
           >
-            Open developer dashboard &rarr;
+            Abrir painel do desenvolvedor →
           </a>
         </div>
       )}
       <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-        Paste the Client ID and Client Secret from the app you created above.
+        Cole o Client ID e o Client Secret do aplicativo criado acima.
       </div>
       <InlineConnectForm
         fields={[
@@ -407,10 +406,10 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       <div style={{ display: 'flex', gap: 4, marginBottom: 10,
         background: 'var(--color-bg)', borderRadius: 6, padding: 2 }}>
         <button style={tabStyle(tab === 'paste')} onClick={() => setTab('paste')}>
-          Paste Text
+          Colar texto
         </button>
         <button style={tabStyle(tab === 'upload')} onClick={() => setTab('upload')}>
-          Upload Files
+          Enviar arquivos
         </button>
       </div>
 
@@ -418,7 +417,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title (optional)"
+        placeholder="Título (opcional)"
         style={inputStyle}
       />
 
@@ -427,7 +426,7 @@ function UploadForm({ onDone }: { onDone?: () => void }) {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste your text here..."
+            placeholder="Cole seu texto aqui..."
             rows={6}
             style={{
               ...inputStyle,
@@ -684,10 +683,10 @@ export function SyncStatusDisplay({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-warning)', marginBottom: 4 }}>
-          Disconnect pending — waiting for the active sync to stop.
+          Desconexão pendente — aguardando o fim da sincronização ativa.
         </div>
         <div style={{ fontSize: 10.5, color: 'var(--color-text-tertiary)' }}>
-          Indexed data will be cleaned up before this source disconnects.
+          Os dados indexados serão removidos antes de desconectar esta fonte.
         </div>
       </div>
     );
@@ -698,7 +697,7 @@ export function SyncStatusDisplay({
     return (
       <div>
         <div style={{ fontSize: 12, color: 'var(--color-error)', marginBottom: 4 }}>
-          Error: {sync.error}
+          Erro: {sync.error}
         </div>
         <button
           onClick={handleSync}
@@ -734,7 +733,7 @@ export function SyncStatusDisplay({
     return (
       <div>
         <div style={{ fontSize: 11, color: 'var(--color-warning)', marginBottom: 4 }}>
-          Indexed{' '}
+          Indexados{' '}
           <span key={totalIndexed} className="sync-bump">
             {totalIndexed.toLocaleString()} {unitLabel}
           </span>{' '}
@@ -742,11 +741,11 @@ export function SyncStatusDisplay({
             ({rangeLabel})
           </span>{' '}
           <span style={{ color: 'var(--color-text-tertiary)' }}>
-            · Still indexing…
+            · Indexação em andamento…
           </span>
         </div>
         <div style={{ fontSize: 10.5, color: 'var(--color-text-tertiary)' }}>
-          Deep Research available now · results improve as more {unitLabel} are indexed
+          Pesquisa aprofundada disponível · os resultados melhoram conforme mais {unitLabel} itens são indexados
         </div>
       </div>
     );
@@ -763,7 +762,7 @@ export function SyncStatusDisplay({
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: 'var(--color-success)' }}>
-            Indexed {totalIndexed.toLocaleString()} {unitLabel}
+            Indexados {totalIndexed.toLocaleString()} {unitLabel}
             {rangeLabel && (
               <span style={{ color: 'var(--color-text-tertiary)' }}>
                 {' '}({rangeLabel})
@@ -771,7 +770,7 @@ export function SyncStatusDisplay({
             )}
             {lastSyncLabel && (
               <span style={{ color: 'var(--color-text-tertiary)' }}>
-                {' · '}Last synced {lastSyncLabel}
+                {' · '}Última sincronização {lastSyncLabel}
               </span>
             )}
           </span>
@@ -822,7 +821,7 @@ export function SyncStatusDisplay({
       </div>
       {hasSynced && connectorId === 'slack' && (
         <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 4 }}>
-          Tip: invite the bot to channels with /invite @OpenJarvis, then re-sync
+          Dica: convide o bot para os canais com /invite @OpenJarvis e sincronize novamente
         </div>
       )}
       {syncError && (
@@ -951,7 +950,7 @@ function DataSourcesSection() {
     if (loading || disconnectAbortRef.current) return;
     setLoading(true);
     setConnectingId(id);
-    setConnectStage('Connecting...');
+    setConnectStage("Conectando...");
     setConnectError('');
     try {
       const resp = req === null ? null : await connectSource(id, req);
@@ -1050,7 +1049,7 @@ function DataSourcesSection() {
       <div className="flex flex-col gap-5">
         <section>
           <div className="hud-label mb-2" style={{ color: 'var(--color-text-tertiary)' }}>
-            Loading sources…
+            Carregando fontes…
           </div>
           <div className="flex flex-col gap-2">
             {[0, 1, 2, 3].map((i) => (
@@ -1077,7 +1076,7 @@ function DataSourcesSection() {
         <section>
           <div className="hud-label mb-2 flex items-center gap-2">
             <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: 'var(--color-success)' }} />
-            Connected · {connected.length}
+            Conectados · {connected.length}
           </div>
           <div className="flex flex-col gap-2">
           {connected.map((c) => {
@@ -1113,7 +1112,7 @@ function DataSourcesSection() {
                     />
                     {disconnectError?.id === c.connector_id && (
                       <div style={{ fontSize: 11, color: 'var(--color-error)', marginTop: 4 }}>
-                        Disconnect failed: {disconnectError.message}
+                        Falha ao desconectar: {disconnectError.message}
                       </div>
                     )}
                   </div>
@@ -1134,7 +1133,7 @@ function DataSourcesSection() {
                   >
                     {disconnectingId === c.connector_id
                       ? sync?.state === 'stopping' ? 'Cleaning up…' : 'Disconnecting…'
-                      : sync?.state === 'stopping' ? 'Finish disconnect' : 'Disconnect'}
+                      : sync?.state === 'stopping' ? 'Finish disconnect' : "Desconectar"}
                   </button>
                 </div>
               </div>
@@ -1149,7 +1148,7 @@ function DataSourcesSection() {
         <section>
           <div className="hud-label mb-2 flex items-center gap-2">
             <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: 999, background: 'var(--color-text-tertiary)' }} />
-            Available · {notConnected.length}
+            Disponíveis · {notConnected.length}
           </div>
           <div className="grid grid-cols-2 gap-2">
           {notConnected.map((c) => {
@@ -1179,7 +1178,7 @@ function DataSourcesSection() {
                       {meta?.display_name ?? c.display_name}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2 }}>
-                      {meta?.description ?? 'Not connected'}
+                      {meta?.description ?? "Não conectado"}
                     </div>
                   </div>
                   <span style={{ color: 'var(--color-text-secondary)', fontSize: 12, fontWeight: 500 }}>
@@ -1190,7 +1189,7 @@ function DataSourcesSection() {
                 {isExpanded && c.connector_id === 'upload' && (
                   <div style={{ borderTop: '1px solid var(--color-border)', padding: 12 }}>
                     <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 10 }}>
-                      Paste text or upload files (.txt, .md, .pdf, .docx, .csv) to add them to your knowledge base.
+                      Cole texto ou envie arquivos (.txt, .md, .pdf, .docx, .csv) para adicioná-los à sua base de conhecimento.
                     </div>
                     <UploadForm onDone={loadConnectors} />
                   </div>
@@ -1209,7 +1208,7 @@ function DataSourcesSection() {
                         }}
                       >
                         <div style={{ color: 'var(--color-accent-purple)', fontSize: 10, fontWeight: 600, marginBottom: 3 }}>
-                          STEP {i + 1}
+                          ETAPA {i + 1}
                         </div>
                         <div style={{ fontSize: 12, marginBottom: step.url ? 4 : 0 }}>{step.label}</div>
                         {step.url && (
@@ -1242,7 +1241,7 @@ function DataSourcesSection() {
                     {meta?.troubleshooting && (
                       <details className="mt-2">
                         <summary className="text-[11px] cursor-pointer" style={{ color: 'var(--color-text-tertiary)' }}>
-                          Having trouble?
+                          Precisa de ajuda?
                         </summary>
                         <ul className="mt-1 space-y-1">
                           {meta.troubleshooting.map((tip: string, i: number) => (
@@ -1274,7 +1273,7 @@ function DataSourcesSection() {
                         }}>
                           <div style={{
                             height: '100%', borderRadius: 2, background: 'var(--color-warning)',
-                            width: connectStage.includes('Sync') ? '75%' : connectStage.includes('Connected') ? '50%' : '25%',
+                            width: connectStage.includes('Sync') ? '75%' : connectStage.includes("Conectado") ? '50%' : '25%',
                             transition: 'width 0.5s ease',
                           }} />
                         </div>
@@ -1436,7 +1435,7 @@ function SendBlueSection({
               border: '1px solid var(--color-border)',
               borderRadius: 4, cursor: 'pointer',
             }}
-          >Remove</button>
+          >Remover</button>
         </div>
         {health && (
           <div style={{
@@ -1527,9 +1526,9 @@ function SendBlueSection({
             borderRadius: 6,
             borderLeft: '3px solid var(--color-accent, var(--color-accent-purple))',
           }}>
-            <div><strong>1.</strong> Open a terminal and run: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
-            <div style={{ marginTop: 4 }}><strong>2.</strong> Copy the <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL (e.g. https://abc123.ngrok.io)</div>
-            <div style={{ marginTop: 4 }}><strong>3.</strong> Paste it below and click "Register Webhook"</div>
+            <div><strong>1.</strong> Abra um terminal e execute: <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>ngrok http 8000</code></div>
+            <div style={{ marginTop: 4 }}><strong>2.</strong> Copie a <code style={{ color: 'var(--color-accent)', background: 'var(--color-bg)', padding: '1px 4px', borderRadius: 3 }}>https://</code> forwarding URL (e.g. https://abc123.ngrok.io)</div>
+            <div style={{ marginTop: 4 }}><strong>3.</strong> Cole abaixo e clique em “Registrar webhook”</div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
@@ -1551,13 +1550,13 @@ function SendBlueSection({
             >
               {webhookStatus === 'registering' ? 'Registering...'
                 : webhookStatus === 'done' ? 'Registered!'
-                : webhookStatus === 'error' ? 'Retry'
+                : webhookStatus === 'error' ? "Tentar novamente"
                 : 'Register Webhook'}
             </button>
           </div>
           {webhookStatus === 'done' && (
             <div style={{ fontSize: 11, color: 'var(--color-success)', marginTop: 6 }}>
-              Webhook registered! Incoming texts will be forwarded to your agent.
+              Webhook registrado! As mensagens recebidas serão encaminhadas ao agente.
             </div>
           )}
           {webhookStatus === 'error' && (
@@ -1566,7 +1565,7 @@ function SendBlueSection({
             </div>
           )}
           <div style={{ fontSize: 10, color: 'var(--color-text-tertiary)', marginTop: 8 }}>
-            Don't have ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Download it free</a>. You can also skip this step and register the webhook later.
+            Não tem o ngrok? <a href="https://ngrok.com/download" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}>Baixe gratuitamente</a>. You can also skip this step and register the webhook later.
           </div>
         </div>
       ),
@@ -1666,7 +1665,7 @@ function SendBlueSection({
                   border: '1px solid var(--color-border)',
                   borderRadius: 5, cursor: 'pointer',
                 }}
-              >Back</button>
+              >Voltar</button>
             )}
             {step < steps.length - 1 ? (
               <button
@@ -1679,7 +1678,7 @@ function SendBlueSection({
                   cursor: 'pointer', fontWeight: 600,
                   opacity: steps[step]?.canAdvance ? 1 : 0.5,
                 }}
-              >Next</button>
+              >Avançar</button>
             ) : (
               <button
                 onClick={handleFinish}
@@ -1691,7 +1690,7 @@ function SendBlueSection({
                   cursor: 'pointer', fontWeight: 600,
                   opacity: loading || !steps[step]?.canAdvance ? 0.5 : 1,
                 }}
-              >{loading ? 'Connecting...' : 'Connect'}</button>
+              >{loading ? "Conectando..." : "Conectar"}</button>
             )}
           </div>
         </div>
@@ -1790,7 +1789,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     background: 'color-mix(in srgb, var(--color-success) 22%, transparent)', color: 'var(--color-success)',
                     padding: '2px 8px', borderRadius: 10,
                     fontSize: 10, fontWeight: 600,
-                  }}>Active</span>
+                  }}>Ativo</span>
                   <button
                     onClick={() => handleRemove(binding.id)}
                     style={{
@@ -1799,7 +1798,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                       border: '1px solid var(--color-border)',
                       borderRadius: 4, cursor: 'pointer',
                     }}
-                  >Remove</button>
+                  >Remover</button>
                 </div>
               ) : (
                 <button
@@ -1809,7 +1808,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     color: 'var(--color-on-accent)', border: 'none', borderRadius: 5,
                     cursor: 'pointer', fontWeight: 600,
                   }}
-                >{isSetup ? 'Cancel' : 'Set Up'}</button>
+                >{isSetup ? "Cancelar" : 'Set Up'}</button>
               )}
             </div>
 
@@ -1862,7 +1861,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                                 border: 'none', borderRadius: 3,
                                 cursor: 'pointer', fontWeight: 600,
                               }}
-                            >Copy</button>
+                            >Copiar</button>
                           </div>
                         </div>
                       );
@@ -1899,7 +1898,7 @@ function MessagingSection({ agentId }: { agentId: string }) {
                     cursor: 'pointer', fontWeight: 600,
                     opacity: loading || !canConnect ? 0.5 : 1, marginTop: 4,
                   }}
-                >{loading ? 'Connecting...' : 'Connect'}</button>
+                >{loading ? "Conectando..." : "Conectar"}</button>
               </div>
             )}
           </div>
@@ -2046,18 +2045,18 @@ function MemorySection() {
               <Brain size={18} style={{ color: 'var(--color-accent-purple)' }} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Memory Backend</h3>
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Motor de memória</h3>
               {statsError ? (
                 <div className="mt-0.5">
                   <p role="alert" className="text-xs break-words" style={{ color: 'var(--color-error)' }}>{statsError}</p>
                   <button
                     type="button"
                     onClick={loadStats}
-                    aria-label="Retry memory backend status"
+                    aria-label="Verificar novamente o estado do motor de memória"
                     className="text-xs underline cursor-pointer mt-1"
                     style={{ color: 'var(--color-accent)' }}
                   >
-                    Retry
+                    Tentar novamente
                   </button>
                 </div>
               ) : stats ? (
@@ -2070,7 +2069,7 @@ function MemorySection() {
                   </span>
                 </div>
               ) : (
-                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Connecting...</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-tertiary)' }}>Conectando...</p>
               )}
             </div>
           </div>
@@ -2080,7 +2079,7 @@ function MemorySection() {
                 {stats.entries.toLocaleString()}
               </div>
               <div className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--color-text-tertiary)' }}>
-                indexed
+                indexados
               </div>
             </div>
           )}
@@ -2094,7 +2093,7 @@ function MemorySection() {
       >
         <div className="flex items-center gap-2 mb-3">
           <Search size={14} style={{ color: 'var(--color-accent-purple)' }} />
-          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Search Memory</h3>
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Buscar na memória</h3>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 relative">
@@ -2102,7 +2101,7 @@ function MemorySection() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-              placeholder="What are you looking for?"
+              placeholder="O que você procura?"
               className="w-full text-sm px-3 py-2 rounded-lg outline-none transition-colors"
               style={{
                 background: 'var(--color-bg)',
@@ -2122,7 +2121,7 @@ function MemorySection() {
             }}
           >
             {searching ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
-            {searching ? 'Searching' : 'Search'}
+            {searching ? 'Searching' : "Buscar"}
           </button>
         </div>
 
@@ -2130,7 +2129,7 @@ function MemorySection() {
         {searchDone && searchResults.length === 0 && (
           <div className="flex flex-col items-center py-6 gap-2">
             <Search size={20} style={{ color: 'var(--color-text-tertiary)', opacity: 0.4 }} />
-            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>No matching memories found</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>Nenhuma memória correspondente encontrada</p>
           </div>
         )}
         {searchResults.length > 0 && (
@@ -2160,7 +2159,7 @@ function MemorySection() {
                         ? 'var(--color-warning)'
                         : 'var(--color-text-tertiary)',
                   }}>
-                    {(r.score * 100).toFixed(0)}% match
+                    {(r.score * 100).toFixed(0)}% de correspondência
                   </span>
                   {r.metadata?.source != null && (
                     <span className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>
@@ -2183,10 +2182,10 @@ function MemorySection() {
         >
           <div className="flex items-center gap-2 mb-3">
             <FolderOpen size={14} style={{ color: 'var(--color-accent-purple)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Index Folder</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Indexar pasta</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
-            Scan a folder and index all supported files into memory.
+            Analise uma pasta e indexe na memória todos os arquivos compatíveis.
           </p>
           <div className="flex gap-2 mb-2">
             <input
@@ -2211,7 +2210,7 @@ function MemorySection() {
                 }}
               >
                 <FolderOpen size={12} />
-                Browse
+                Procurar
               </button>
             )}
           </div>
@@ -2243,15 +2242,15 @@ function MemorySection() {
         >
           <div className="flex items-center gap-2 mb-3">
             <FileText size={14} style={{ color: 'var(--color-accent-purple)' }} />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Store Text</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Armazenar texto</h3>
           </div>
           <p className="text-xs mb-3" style={{ color: 'var(--color-text-tertiary)' }}>
-            Paste any text to add directly to your memory store.
+            Cole um texto para adicioná-lo diretamente à memória.
           </p>
           <textarea
             value={storeContent}
             onChange={(e) => setStoreContent(e.target.value)}
-            placeholder="Paste or type content here..."
+            placeholder="Cole ou digite o conteúdo aqui..."
             rows={4}
             className="w-full text-sm px-3 py-2 rounded-lg outline-none resize-y"
             style={{
@@ -2332,9 +2331,9 @@ export function DataSourcesPage() {
   }, [activeTab, firstAgent, creatingAgent, ensureAgent]);
 
   const tabs = [
-    { id: 'sources' as const, label: 'Data Sources', icon: Database },
-    { id: 'messaging' as const, label: 'Messaging Channels', icon: MessageSquare },
-    { id: 'memory' as const, label: 'Memory', icon: Brain },
+    { id: 'sources' as const, label: "Fontes de dados", icon: Database },
+    { id: 'messaging' as const, label: "Canais de mensagens", icon: MessageSquare },
+    { id: 'memory' as const, label: "Memória", icon: Brain },
   ];
 
   return (
@@ -2342,10 +2341,10 @@ export function DataSourcesPage() {
       <div className="max-w-5xl mx-auto">
       <header className="mb-6">
         <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-          Data Sources, Channels &amp; Memory
+          Fontes de dados, canais e memória
         </h1>
         <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-          Connect personal data so the assistant can search across everything, and set up messaging channels to chat from your phone.
+          Conecte seus dados para que o assistente possa consultá-los e configure canais para conversar pelo celular.
         </p>
       </header>
 
@@ -2387,7 +2386,7 @@ export function DataSourcesPage() {
           ) : creatingAgent ? (
             <div className="flex items-center gap-3 p-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-accent)' }} />
-              Setting up your assistant...
+              Configurando seu assistente...
             </div>
           ) : null
         )}

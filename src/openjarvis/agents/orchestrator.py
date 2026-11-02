@@ -96,6 +96,88 @@ class OrchestratorAgent(ToolUsingAgent):
         context: Optional[AgentContext] = None,
         **kwargs: Any,
     ) -> AgentResult:
+        # Explicit launch requests must execute the tool, even when a small
+        # local model would otherwise answer with an invented confirmation.
+        launch = re.fullmatch(
+            r"\s*(?:por favor[, ]+)?"
+            r"(?:abra|abre|abrir|inicie|iniciar|execute|executar|open|launch|start)\s+"
+            r"(?:(?:o|a|the)\s+)?([^\n!?;]+?)[.!]?\s*",
+            input,
+            re.IGNORECASE,
+        )
+        from openjarvis.operators.gui_operator import browser_search_intent
+
+        user_history = (
+            [
+                message.text
+                for message in context.conversation.messages
+                if message.role == Role.USER
+            ]
+            if context
+            else []
+        )
+        gui_params = (
+            context.metadata["navigation_action"]
+            if context and "navigation_action" in context.metadata
+            else browser_search_intent(input, user_history)
+        )
+        has_gui = any(tool.spec.name == "gui_control" for tool in self._tools)
+        has_browser = any(tool.spec.name == "browser_task" for tool in self._tools)
+        semantic_launch = bool(
+            gui_params
+            and gui_params.get("action") == "open_app"
+            and any(tool.spec.name == "open_app" for tool in self._tools)
+        )
+        browser_task = bool(
+            gui_params
+            and has_browser
+            and gui_params.get("action")
+            in {
+                "browser_search",
+                "browser_task",
+            }
+        )
+        if (
+            semantic_launch
+            or browser_task
+            or (gui_params and has_gui)
+            or (launch and any(tool.spec.name == "open_app" for tool in self._tools))
+        ):
+            if semantic_launch:
+                call = ToolCall(
+                    id="semantic_open_app",
+                    name="open_app",
+                    arguments=json.dumps({"app": gui_params["app"]}),
+                )
+            elif browser_task:
+                call = ToolCall(
+                    id="explicit_browser",
+                    name="browser_task",
+                    arguments=json.dumps({"task": input, "context": user_history[-4:]}),
+                )
+            else:
+                call = ToolCall(
+                    id="explicit_gui"
+                    if gui_params and has_gui
+                    else "explicit_open_app",
+                    name="gui_control" if gui_params and has_gui else "open_app",
+                    arguments=json.dumps(
+                        gui_params
+                        if gui_params and has_gui
+                        else {"app": launch.group(1).strip()}
+                    ),
+                )
+            self._emit_turn_start(input)
+            self._build_messages(input, context, system_prompt=self._system_prompt)
+            result = self._check_tool_allowed(call)
+            if result is None:
+                result = self._executor.execute(call)
+            try:
+                content = json.loads(result.content)["message"]
+            except (ValueError, KeyError, TypeError):
+                content = result.content
+            self._emit_turn_end(turns=1, content_length=len(content))
+            return AgentResult(content=content, tool_results=[result], turns=1)
         if self._mode == "structured":
             return self._run_structured(input, context, **kwargs)
         return self._run_function_calling(input, context, **kwargs)

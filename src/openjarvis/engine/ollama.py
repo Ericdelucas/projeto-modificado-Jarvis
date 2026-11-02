@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 
 import httpx
 
+from openjarvis.core.language import portuguese_messages
 from openjarvis.core.registry import EngineRegistry
 from openjarvis.core.types import Message
 from openjarvis.engine._base import (
@@ -147,7 +148,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         max_tokens: int = 1024,
         **kwargs: Any,
     ) -> Dict[str, Any]:
-        msg_dicts = messages_to_dicts(messages)
+        msg_dicts = portuguese_messages(messages_to_dicts(messages))
         # Ollama expects tool_call arguments as dicts, not JSON strings
         for md in msg_dicts:
             for tc in md.get("tool_calls", []):
@@ -282,7 +283,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
     ) -> AsyncIterator[str]:
         payload: Dict[str, Any] = {
             "model": model,
-            "messages": messages_to_dicts(messages),
+            "messages": portuguese_messages(messages_to_dicts(messages)),
             "stream": True,
             "options": _ollama_request_options(
                 temperature=temperature,
@@ -368,7 +369,7 @@ class OllamaEngine(AsyncHTTPEngineMixin, InferenceEngine):
         response. Falls back to a tools-less retry on 400 (mirrors
         ``generate()``'s behaviour for models that don't support tools).
         """
-        msg_dicts = messages_to_dicts(messages)
+        msg_dicts = portuguese_messages(messages_to_dicts(messages))
         for md in msg_dicts:
             for tc in md.get("tool_calls", []):
                 fn = tc.get("function", {})

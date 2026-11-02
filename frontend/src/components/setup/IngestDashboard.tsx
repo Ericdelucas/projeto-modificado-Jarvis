@@ -53,9 +53,9 @@ function ProgressRow({
               : isDone
                 ? `${status!.items_synced} items`
                 : status?.state === 'paused'
-                  ? 'Paused'
+                  ? "Pausado"
                   : status?.state === 'error'
-                    ? 'Error'
+                    ? "Erro"
                     : 'Starting...'}
           </span>
         </div>

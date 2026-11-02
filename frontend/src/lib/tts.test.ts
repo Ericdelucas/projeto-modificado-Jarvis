@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('./streaming-speech', () => ({ prepareStreamingSpeech: vi.fn() }));
+import { prepareStreamingSpeech } from './streaming-speech';
+
 vi.mock('./api', () => ({
   synthesizeSpeech: vi.fn(),
   fetchTtsHealth: vi.fn(),
@@ -250,5 +253,40 @@ describe('autoplay gating', () => {
     expect(
       shouldAutoplayFinishedReply('chat-1', 'chat-2', true, { role: 'assistant', id: 'old' }, null),
     ).toBe(false);
+  });
+});
+
+describe('neural voice output', () => {
+  it('cleans Markdown and plays the server MP3 even when browser speech exists', async () => {
+    const speak = vi.fn();
+    vi.stubGlobal('window', { speechSynthesis: { speak } });
+    synth.mockResolvedValue(new Blob(['mp3'], { type: 'audio/mpeg' }));
+    await useTtsStore.getState().speak('pt', '# Olá!\n**Tudo bem?** Veja [aqui](https://example.com).');
+    expect(synth).toHaveBeenCalledWith('Olá! Tudo bem? Veja aqui.', expect.objectContaining({ signal: expect.any(AbortSignal) }));
+    expect(FakeAudio.instances).toHaveLength(1);
+    expect(FakeAudio.instances[0].playCalls).toBe(1);
+    expect(speak).not.toHaveBeenCalled();
+    expect(useTtsStore.getState().state).toBe('speaking');
+  });
+});
+
+
+describe('ordered streaming audio queue', () => {
+  it('prefetches the next phrase and plays it only when the first ends', async () => {
+    const first = new FakeAudio('stream:1');
+    const second = new FakeAudio('stream:2');
+    vi.mocked(prepareStreamingSpeech)
+      .mockResolvedValueOnce({ audio: first as unknown as HTMLAudioElement, dispose: vi.fn() })
+      .mockResolvedValueOnce({ audio: second as unknown as HTMLAudioElement, dispose: vi.fn() });
+    useTtsStore.getState().enqueue('reply', 'Primeira frase.');
+    useTtsStore.getState().enqueue('reply', 'Segunda frase.');
+    await vi.waitFor(() => expect(first.playCalls).toBe(1));
+    expect(second.playCalls).toBe(0);
+    first.onended?.();
+    await vi.waitFor(() => expect(second.playCalls).toBe(1));
+    const calls = vi.mocked(prepareStreamingSpeech).mock.calls;
+    const signal = calls[calls.length - 1][1];
+    useTtsStore.getState().stop();
+    expect(signal.aborted).toBe(true);
   });
 });

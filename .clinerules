@@ -1,0 +1,4 @@
+Siga AGENTS.md para delimitar o contexto e as exclusões deste projeto.
+Comece pelo diretório específico da funcionalidade solicitada; não carregue o repositório inteiro.
+Não leia dependências, .runtime/, books-programação/, .venv/, node_modules/, caches, logs, artefatos gerados ou credenciais como contexto geral.
+Amplie o escopo somente quando uma dependência ou um erro concreto exigir isso.

@@ -302,7 +302,7 @@ export function MemoryBrowser({ apiUrl }: { apiUrl: string }) {
           onClick={handleSearch}
           disabled={searching || !query.trim()}
         >
-          {searching ? 'Searching...' : 'Search'}
+          {searching ? 'Searching...' : "Buscar"}
         </button>
       </div>
 

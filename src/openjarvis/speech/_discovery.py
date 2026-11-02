@@ -35,6 +35,15 @@ def _create_backend(
                 model_size=config.speech.model,
                 device=config.speech.device,
                 compute_type=config.speech.compute_type,
+                language=config.speech.language,
+                vad_filter=config.speech.vad_filter,
+                vad_min_silence_duration_ms=config.speech.vad_min_silence_duration_ms,
+                vad_speech_pad_ms=config.speech.vad_speech_pad_ms,
+                beam_size=config.speech.beam_size,
+                condition_on_previous_text=config.speech.condition_on_previous_text,
+                vad_threshold=config.speech.vad_threshold,
+                no_speech_threshold=config.speech.no_speech_threshold,
+                min_avg_logprob=config.speech.min_avg_logprob,
             )
         elif key == "openai":
             api_key = os.environ.get("OPENAI_API_KEY", "")

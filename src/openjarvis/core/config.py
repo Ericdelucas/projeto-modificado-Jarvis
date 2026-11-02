@@ -25,6 +25,7 @@ from typing import (
     get_type_hints,
 )
 
+from openjarvis.core.language import DEFAULT_SYSTEM_PROMPT
 from openjarvis.core.paths import (
     ConfigurationError,
     get_cache_dir,
@@ -32,6 +33,7 @@ from openjarvis.core.paths import (
     get_config_path,
     get_data_dir,
 )
+from openjarvis.programacao.config import ProgramacaoConfig
 
 if TYPE_CHECKING:
     # Only used by type-checkers (mypy/pyright) for the ``JarvisConfig.mining``
@@ -1139,13 +1141,7 @@ class AgentConfig:
     system_prompt: str = ""  # inline system prompt (takes precedence if set)
     system_prompt_path: str = ""  # path to system prompt file (.txt, .md)
     context_from_memory: bool = True  # inject relevant memory context into prompts
-    default_system_prompt: str = (
-        "You are OpenJarvis, a helpful AI assistant running locally on the "
-        "user's own hardware. You are not a cloud service, and you are not "
-        "Claude, ChatGPT, Gemini, or any other branded assistant. If asked "
-        "who or what you are, identify yourself as OpenJarvis. Respond "
-        "helpfully, concisely, and accurately."
-    )
+    default_system_prompt: str = DEFAULT_SYSTEM_PROMPT
 
     # Backward-compat property for old field name
     @property
@@ -1628,6 +1624,21 @@ class SpeechConfig:
     language: str = ""  # Empty = auto-detect
     device: str = "auto"  # "auto", "cpu", "cuda"
     compute_type: str = "float16"  # "float16", "int8", "float32"
+    vad_filter: bool = True
+    vad_min_silence_duration_ms: int = 500
+    vad_speech_pad_ms: int = 200
+    beam_size: int = 3
+    condition_on_previous_text: bool = False
+    # Silero VAD speech probability; higher ignores more background noise.
+    vad_threshold: float = 0.5
+    # Segments above this no-speech probability or below this average token
+    # log-probability are discarded as likely hallucinations.
+    no_speech_threshold: float = 0.6
+    min_avg_logprob: float = -1.0
+    # Wake word (Vosk): minimum word confidence and how many identical
+    # partial results (80 ms each) are needed when Vosk reports no confidence.
+    wake_threshold: float = 0.65
+    wake_stable_frames: int = 3
     # Text-to-speech. ``voice_id`` is interpreted by ``tts_backend`` only --
     # voice IDs are not portable between backends, so if voice output falls
     # back to a different backend that backend's own default voice is used.
@@ -1766,6 +1777,26 @@ class DigestConfig:
     )
 
 
+@dataclass(slots=True)
+class GoogleCalendarConfig:
+    """Live read-only Calendar configuration; secrets are stored outside the repo."""
+
+    timezone: str = ""
+    client_secrets: str = ""
+
+
+@dataclass(slots=True)
+class ComputerUseConfig:
+    """Browser planning stays small; vision requires an explicit model choice."""
+
+    vision_model: str = ""
+    num_ctx: int = 4096
+    max_steps: int = 24
+    timeout: float = 180.0
+    min_available_mb: int = 1536
+    vision_min_available_mb: int = 8192
+
+
 @dataclass
 class JarvisConfig:
     """Top-level configuration for OpenJarvis."""
@@ -1780,6 +1811,9 @@ class JarvisConfig:
     tools: ToolsConfig = field(default_factory=ToolsConfig)
     agent: AgentConfig = field(default_factory=AgentConfig)
     server: ServerConfig = field(default_factory=ServerConfig)
+    google_calendar: GoogleCalendarConfig = field(default_factory=GoogleCalendarConfig)
+    programacao: ProgramacaoConfig = field(default_factory=ProgramacaoConfig)
+    computer_use: ComputerUseConfig = field(default_factory=ComputerUseConfig)
     telemetry: TelemetryConfig = field(default_factory=TelemetryConfig)
     analytics: AnalyticsConfig = field(default_factory=AnalyticsConfig)
     traces: TracesConfig = field(default_factory=TracesConfig)
@@ -2109,6 +2143,9 @@ def load_config(path: Optional[Path] = None) -> JarvisConfig:
             "learning",
             "agent",
             "server",
+            "google_calendar",
+            "programacao",
+            "computer_use",
             "telemetry",
             "analytics",
             "traces",

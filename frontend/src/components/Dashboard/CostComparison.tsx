@@ -1,5 +1,6 @@
 import { DollarSign, TrendingDown, Cloud, HardDrive } from 'lucide-react';
 import { useAppStore } from '../../lib/store';
+import { SHOW_COST_COMPARISON } from '../../lib/ui-config';
 
 const CLOUD_PRICING = [
   { name: 'GPT-5.6 Sol', input: 5.00, output: 30.00 },
@@ -10,15 +11,17 @@ const CLOUD_PRICING = [
 export function CostComparison() {
   const savings = useAppStore((s) => s.savings);
 
+  if (!SHOW_COST_COMPARISON) return null;
+
   if (!savings || savings.total_tokens === 0) {
     return (
       <div className="hud-panel p-6">
         <h3 className="hud-label flex items-center gap-2 mb-4">
           <DollarSign size={12} style={{ color: 'var(--color-success)' }} />
-          Cost Comparison
+          Comparação de custos
         </h3>
         <div className="h-48 flex items-center justify-center text-sm" style={{ color: 'var(--color-text-tertiary)' }}>
-          <span className="hud-mono">awaiting first inference…</span>
+          <span className="hud-mono">aguardando a primeira inferência…</span>
         </div>
       </div>
     );
@@ -31,7 +34,7 @@ export function CostComparison() {
     <div className="hud-panel p-6">
       <h3 className="hud-label flex items-center gap-2 mb-4">
         <DollarSign size={12} style={{ color: 'var(--color-success)' }} />
-        Cost Comparison*
+        Comparação de custos*
       </h3>
 
       {/* Local stats */}
@@ -42,10 +45,10 @@ export function CostComparison() {
         <HardDrive size={18} style={{ color: 'var(--color-accent)' }} />
         <div className="flex-1">
           <div className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-            Local (your hardware)
+            Local (seu computador)
           </div>
           <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-            {savings.total_calls} requests &middot; {savings.total_tokens.toLocaleString()} tokens
+            {savings.total_calls} requisições · {savings.total_tokens.toLocaleString()} tokens
           </div>
         </div>
         <div className="text-right">
@@ -53,7 +56,7 @@ export function CostComparison() {
             ${savings.local_cost.toFixed(4)}
           </div>
           <div className="text-[10px]" style={{ color: 'var(--color-text-tertiary)' }}>
-            electricity only
+            apenas eletricidade
           </div>
         </div>
       </div>
@@ -82,7 +85,7 @@ export function CostComparison() {
                 {saved > 0 && (
                   <div className="text-[10px] flex items-center gap-0.5 justify-end" style={{ color: 'var(--color-success)' }}>
                     <TrendingDown size={10} />
-                    ${saved.toFixed(4)} saved
+                    ${saved.toFixed(4)} economizados
                   </div>
                 )}
               </div>
@@ -93,7 +96,7 @@ export function CostComparison() {
 
       <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--color-border)' }}>
         <p className="text-[10px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
-          *Savings estimates assume local models (e.g. Qwen, Nemotron, Kimi) produce roughly the same number of tokens per request, on average, as closed-source cloud models.
+          *As estimativas de economia pressupõem que modelos locais (Qwen, Nemotron, Kimi etc.) geram, em média, aproximadamente a mesma quantidade de tokens por requisição que os modelos proprietários na nuvem.
         </p>
       </div>
     </div>

@@ -35,30 +35,30 @@ export function LogsPage() {
         <header className="mb-6 shrink-0">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-lg font-semibold" style={{ color: 'var(--color-text)' }}>
-              Logs
+              Registros
             </h1>
             <div className="flex items-center gap-2">
               <span className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                {logEntries.length} entries
+                {logEntries.length} registros
               </span>
               <button
                 onClick={handleCopy}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer"
                 style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }}
               >
-                <Copy size={12} /> Copy All
+                <Copy size={12} /> Copiar tudo
               </button>
               <button
                 onClick={clearLogs}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer"
                 style={{ background: 'var(--color-bg-secondary)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border)' }}
               >
-                <Trash2 size={12} /> Clear
+                <Trash2 size={12} /> Limpar
               </button>
             </div>
           </div>
           <p className="text-sm mt-2 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
-            Recent activity — chat events, model switches, tool calls, and system messages from this session.
+            Atividade recente: conversas, mudanças de modelo, chamadas de ferramentas e mensagens do sistema nesta sessão.
           </p>
         </header>
 
@@ -69,7 +69,7 @@ export function LogsPage() {
         >
           {logEntries.length === 0 ? (
             <div className="text-center py-12" style={{ color: 'var(--color-text-tertiary)' }}>
-              No log entries yet. Logs appear as you chat, switch models, and interact with the app.
+              Nenhum registro ainda. Eles aparecem conforme você conversa, troca de modelo e usa o aplicativo.
             </div>
           ) : (
             logEntries.map((entry, i) => (

@@ -1,0 +1,44 @@
+# Dependências, modelos, áudio e ambientes locais
+.runtime/
+books-programação/
+.venv/
+venv/
+**/node_modules/
+
+# Caches
+**/__pycache__/
+**/.ruff_cache/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.cache/
+**/.vite/
+**/.vitest/
+**/*.pyc
+**/*.pyo
+**/*.tsbuildinfo
+
+# Artefatos gerados
+frontend/dist/
+frontend/src-tauri/target/
+src/openjarvis/server/static/
+target/
+dist/
+build/
+htmlcov/
+coverage/
+.coverage
+coverage.xml
+**/*.log
+**/*.log.*
+logs/
+
+# Estado e credenciais locais
+.git/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+.env
+.env.local
+.env.*.local
+client_secret_*.json
+**/token.json

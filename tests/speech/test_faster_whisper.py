@@ -1,5 +1,7 @@
 """Tests for Faster-Whisper speech backend."""
 
+import math
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -18,6 +20,54 @@ def _register_faster_whisper():
 def test_faster_whisper_backend_registers():
     """Backend registers itself in SpeechRegistry."""
     assert SpeechRegistry.contains("faster-whisper")
+
+
+def test_portuguese_default_and_silence_filter_reach_whisper():
+    model = MagicMock()
+    model.transcribe.return_value = ([], MagicMock())
+    backend = FasterWhisperBackend(language="pt-BR", device="cpu")
+    backend._model = model
+    backend.transcribe(b"audio")
+    options = model.transcribe.call_args.kwargs
+    assert options["language"] == "pt"
+    assert options["task"] == "transcribe"
+    assert options["vad_filter"] is True
+    assert options["vad_parameters"]["min_silence_duration_ms"] == 500
+    assert options["vad_parameters"]["speech_pad_ms"] == 200
+    assert options["beam_size"] == 3
+    assert options["condition_on_previous_text"] is False
+
+    backend.transcribe(b"audio", language="en")
+    assert model.transcribe.call_args.kwargs["language"] == "en"
+
+
+def test_confidence_filter_drops_silence_and_low_logprob_segments():
+    def seg(text, no_speech, logprob):
+        return SimpleNamespace(
+            text=text, start=0.0, end=1.0, no_speech_prob=no_speech, avg_logprob=logprob
+        )
+
+    model = MagicMock()
+    model.transcribe.return_value = (
+        [
+            seg(" Jarvis, abra a agenda.", 0.1, -0.2),
+            seg(" Obrigado por assistir.", 0.7, -0.3),
+            seg(" palavra inventada", 0.2, -1.2),
+        ],
+        MagicMock(),
+    )
+    backend = FasterWhisperBackend(
+        vad_threshold=0.6, no_speech_threshold=0.5, min_avg_logprob=-0.8
+    )
+    backend._model = model
+    result = backend.transcribe(b"audio")
+
+    options = model.transcribe.call_args.kwargs
+    assert options["vad_parameters"]["threshold"] == 0.6
+    assert options["no_speech_threshold"] == 0.5
+    assert options["log_prob_threshold"] == -0.8
+    assert result.text == "Jarvis, abra a agenda."
+    assert result.segments[0].confidence == pytest.approx(math.exp(-0.2))
 
 
 def test_faster_whisper_transcribe():

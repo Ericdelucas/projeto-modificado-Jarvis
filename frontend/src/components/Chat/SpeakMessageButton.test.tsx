@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../lib/store', () => ({
-  useAppStore: (selector: (state: { settings: { voiceOutputEnabled: boolean } }) => unknown) =>
-    selector({ settings: { voiceOutputEnabled: true } }),
+vi.mock('../../lib/interaction-mode', () => ({
+  useInteractionMode: (selector: (state: { mode: string }) => unknown) =>
+    selector({ mode: 'voice' }),
 }));
 vi.mock('../../hooks/useTts', () => ({ useTts: vi.fn() }));
 

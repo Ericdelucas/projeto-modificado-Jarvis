@@ -6,7 +6,7 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 # ---------------------------------------------------------------------------
 # Request models
@@ -22,6 +22,8 @@ class ChatMessage(BaseModel):
 
 
 class ChatCompletionRequest(BaseModel):
+    _navigation_resolved: bool = PrivateAttr(default=False)
+    _navigation_action: Optional[dict] = PrivateAttr(default=None)
     model: str
     messages: List[ChatMessage]
     temperature: float = 0.7

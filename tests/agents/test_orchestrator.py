@@ -17,6 +17,38 @@ from openjarvis.tools._stubs import BaseTool, ToolSpec
 # ---------------------------------------------------------------------------
 
 
+def test_explicit_app_request_executes_tool_without_model_confirmation():
+    tool = MagicMock()
+    tool.spec = ToolSpec(name="open_app", description="Launch", parameters={})
+    engine = MagicMock()
+    agent = OrchestratorAgent(engine, "test", tools=[tool])
+    expected = ToolResult(
+        tool_name="open_app",
+        content='{"message":"Não foi possível iniciar Firefox."}',
+        success=False,
+    )
+    agent._executor.execute = MagicMock(return_value=expected)
+    result = agent.run("abra o firefox")
+    call = agent._executor.execute.call_args.args[0]
+    assert call.name == "open_app"
+    assert '"app": "firefox"' in call.arguments
+    assert result.content == "Não foi possível iniciar Firefox."
+    assert result.tool_results == [expected]
+    engine.generate.assert_not_called()
+
+
+def test_explicit_app_request_respects_governance_denial():
+    tool = MagicMock()
+    tool.spec = ToolSpec(name="open_app", description="Launch", parameters={})
+    agent = OrchestratorAgent(
+        MagicMock(), "test", tools=[tool], before_tool_call=lambda *_: False
+    )
+    agent._executor.execute = MagicMock()
+    result = agent.run("abra o firefox")
+    assert not result.tool_results[0].success
+    agent._executor.execute.assert_not_called()
+
+
 class _CalculatorStub(BaseTool):
     tool_id = "calculator"
 

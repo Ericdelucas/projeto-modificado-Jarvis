@@ -135,10 +135,10 @@ export function SettingsPanel({ onSettingsChange }: SettingsPanelProps) {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.heading}>Settings</h2>
+      <h2 style={styles.heading}>Configurações</h2>
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>API URL</label>
+        <label style={styles.label}>URL da API</label>
         <input
           style={styles.input}
           type="text"
@@ -172,7 +172,7 @@ export function SettingsPanel({ onSettingsChange }: SettingsPanelProps) {
       </div>
 
       <div style={styles.fieldGroup}>
-        <label style={styles.label}>Theme</label>
+        <label style={styles.label}>Tema</label>
         <div style={styles.toggleRow}>
           <button
             type="button"
@@ -182,7 +182,7 @@ export function SettingsPanel({ onSettingsChange }: SettingsPanelProps) {
             }}
             onClick={() => setSettings((s) => ({ ...s, theme: 'dark' }))}
           >
-            Dark
+            Escuro
           </button>
           <button
             type="button"
@@ -192,12 +192,12 @@ export function SettingsPanel({ onSettingsChange }: SettingsPanelProps) {
             }}
             onClick={() => setSettings((s) => ({ ...s, theme: 'light' }))}
           >
-            Light
+            Claro
           </button>
         </div>
       </div>
 
-      {saved && <div style={styles.savedNotice}>Settings saved</div>}
+      {saved && <div style={styles.savedNotice}>Configurações salvas</div>}
     </div>
   );
 }

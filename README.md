@@ -1,3 +1,5 @@
+> **Iniciar esta versão no Ubuntu:** veja [README-INICIAR.md](README-INICIAR.md) para copiar e colar os comandos de inicialização, parada e verificação.
+
 <div align="center">
   <img alt="OpenJarvis" src="assets/OpenJarvis_Horizontal_Logo.png" width="400">
 

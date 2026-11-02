@@ -43,9 +43,22 @@ dependencies = [
     "tomli>=2.0; python_version < '3.11'",
     "tomlkit>=0.12",
     "websockets>=15.0.1",
+    "edge-tts>=7.3.1",
+    "vosk>=0.3.45",
+    "sounddevice>=0.5.6",
+    "google-auth>=2.61.0",
+    "google-auth-oauthlib>=1.5.0",
+    "google-api-python-client>=2.201.0",
+    "google-auth-httplib2>=0.4.4",
+    "tzlocal>=5.4.5",
 ]
 
 [project.optional-dependencies]
+programacao = [
+    "faiss-cpu>=1.7",
+    "numpy>=1.24",
+    "pypdf>=5",
+]
 dev = [
     "maturin>=1.12.6",
     "pytest>=8",
@@ -91,7 +104,19 @@ server = [
     "pydantic>=2.0",
     "python-multipart>=0.0.9",
 ]
+daemon = [
+    "python-dotenv>=1.0",
+    "Pillow>=10",
+    "playwright>=1.50",
+    "pyautogui>=0.9.54",
+    "pyperclip>=1.9",
+]
 desktop = [
+    "playwright>=1.50",
+    "pyautogui>=0.9.54",
+    "pyperclip>=1.9",
+    "faiss-cpu>=1.7",
+    "pypdf>=5",
     "fastapi>=0.110",
     "uvicorn>=0.30",
     "pydantic>=2.0",

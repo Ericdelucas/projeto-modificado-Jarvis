@@ -340,7 +340,7 @@ export function AdminPanel({ apiUrl }: { apiUrl: string }) {
             <span style={styles.value}>{serverInfo?.engine || 'N/A'}</span>
           </div>
           <div style={styles.row}>
-            <span style={styles.label}>Model</span>
+            <span style={styles.label}>Modelo</span>
             <span style={styles.value}>{serverInfo?.model || 'N/A'}</span>
           </div>
           <div style={styles.row}>
@@ -365,7 +365,7 @@ export function AdminPanel({ apiUrl }: { apiUrl: string }) {
             </span>
           </div>
           <div style={styles.row}>
-            <span style={styles.label}>API URL</span>
+            <span style={styles.label}>URL da API</span>
             <span style={styles.value}>{apiUrl}</span>
           </div>
 
@@ -408,10 +408,10 @@ export function AdminPanel({ apiUrl }: { apiUrl: string }) {
           <table style={styles.agentTable}>
             <thead>
               <tr>
-                <th style={styles.th}>Name</th>
+                <th style={styles.th}>Nome</th>
                 <th style={styles.th}>Key</th>
-                <th style={styles.th}>Tools</th>
-                <th style={styles.th}>Description</th>
+                <th style={styles.th}>Ferramentas</th>
+                <th style={styles.th}>Descrição</th>
               </tr>
             </thead>
             <tbody>

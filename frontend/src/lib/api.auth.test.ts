@@ -46,6 +46,17 @@ async function freshApi() {
   return await import('./api');
 }
 
+it('sends Portuguese explicitly with microphone audio', async () => {
+  fetchMock.mockResolvedValue(new Response(JSON.stringify({ text: 'Olá', language: 'pt' })));
+  const { transcribeAudio } = await freshApi();
+  await transcribeAudio(new Blob(['audio'], { type: 'audio/webm' }));
+  const [url, options] = fetchMock.mock.calls[0];
+  expect(url).toBe('/v1/speech/transcribe');
+  const form = options?.body as FormData;
+  expect(form.get('language')).toBe('pt');
+  expect(form.get('file')).toBeInstanceOf(Blob);
+});
+
 describe('getApiKey', () => {
   it('returns empty string when no key is configured', async () => {
     const { getApiKey } = await freshApi();

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import os
 import tempfile
 from typing import List, Optional
@@ -34,10 +35,35 @@ class FasterWhisperBackend(SpeechBackend):
         model_size: str = "base",
         device: str = "auto",
         compute_type: str = "float16",
+        language: str = "",
+        vad_filter: bool = True,
+        vad_min_silence_duration_ms: int = 500,
+        vad_speech_pad_ms: int = 200,
+        beam_size: int = 3,
+        condition_on_previous_text: bool = False,
+        vad_threshold: float = 0.5,
+        no_speech_threshold: float = 0.6,
+        min_avg_logprob: float = -1.0,
     ) -> None:
         self._model_size = model_size
         self._device = device
         self._compute_type = compute_type
+        self._language = language
+        self._transcribe_options = {
+            "task": "transcribe",
+            "vad_filter": vad_filter,
+            "vad_parameters": {
+                "min_silence_duration_ms": vad_min_silence_duration_ms,
+                "speech_pad_ms": vad_speech_pad_ms,
+                "threshold": vad_threshold,
+            },
+            "beam_size": beam_size,
+            "condition_on_previous_text": condition_on_previous_text,
+            "no_speech_threshold": no_speech_threshold,
+            "log_prob_threshold": min_avg_logprob,
+        }
+        self._no_speech_threshold = no_speech_threshold
+        self._min_avg_logprob = min_avg_logprob
         self._model: Optional[WhisperModel] = None
         self._last_error: Optional[str] = None
 
@@ -116,12 +142,16 @@ class FasterWhisperBackend(SpeechBackend):
                 with tmp:
                     tmp.write(audio)
 
-                kwargs = {}
-                if language:
-                    kwargs["language"] = language
+                kwargs = dict(self._transcribe_options)
+                requested_language = language or self._language
+                if requested_language:
+                    # Whisper accepts ISO 639-1, not browser locales like pt-BR.
+                    kwargs["language"] = (
+                        requested_language.replace("_", "-").split("-")[0].lower()
+                    )
 
                 segments_iter, info = model.transcribe(tmp.name, **kwargs)
-                segments_list = list(segments_iter)
+                segments_list = [seg for seg in segments_iter if self._confident(seg)]
             finally:
                 try:
                     os.unlink(tmp.name)
@@ -142,7 +172,9 @@ class FasterWhisperBackend(SpeechBackend):
                 text=seg.text.strip(),
                 start=seg.start,
                 end=seg.end,
-                confidence=None,
+                confidence=math.exp(seg.avg_logprob)
+                if isinstance(getattr(seg, "avg_logprob", None), float)
+                else None,
             )
             for seg in segments_list
         ]
@@ -155,6 +187,14 @@ class FasterWhisperBackend(SpeechBackend):
             duration_seconds=getattr(info, "duration", 0.0),
             segments=segments,
         )
+
+    def _confident(self, seg) -> bool:
+        """Drop segments Whisper itself flags as silence or low confidence."""
+        no_speech = getattr(seg, "no_speech_prob", None)
+        logprob = getattr(seg, "avg_logprob", None)
+        if isinstance(no_speech, float) and no_speech > self._no_speech_threshold:
+            return False
+        return not isinstance(logprob, float) or logprob >= self._min_avg_logprob
 
     def health(self) -> bool:
         """Check if model is loaded or loadable."""

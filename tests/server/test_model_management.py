@@ -54,6 +54,52 @@ def _app(engine, engine_name="mock"):
 
 
 class TestModelPull:
+    @pytest.mark.parametrize("wrapped", [False, True])
+    def test_pull_routes_multi_engine_to_actual_ollama_host(self, wrapped):
+        from types import SimpleNamespace
+
+        ollama = _make_ollama_engine()
+        ollama._host = "http://127.0.0.1:11435"
+        child = (
+            SimpleNamespace(engine_id="instrumented", _inner=ollama)
+            if wrapped
+            else ollama
+        )
+        engine = _make_engine(engine_id="multi")
+        engine._engines = [("vllm", _make_engine("vllm")), ("ollama", child)]
+        client = TestClient(_app(engine, engine_name="multi"))
+        response = MagicMock()
+        with patch("httpx.AsyncClient") as http:
+            http.return_value.__aenter__.return_value.post = AsyncMock(
+                return_value=response
+            )
+            result = client.post("/v1/models/pull", json={"model": "test-model"})
+        assert result.status_code == 200
+        http.assert_called_once_with(base_url=ollama._host, timeout=600.0)
+        http.return_value.__aenter__.return_value.post.assert_awaited_once_with(
+            "/api/pull",
+            json={"name": "test-model", "stream": False},
+        )
+        engine.list_models.assert_called()
+
+    def test_pull_routes_instrumented_engine(self):
+        engine = _make_engine(engine_id="instrumented")
+        engine._inner = _make_ollama_engine()
+        client = TestClient(_app(engine, engine_name="instrumented"))
+        with patch("httpx.AsyncClient") as http:
+            http.return_value.__aenter__.return_value.post = AsyncMock(
+                return_value=MagicMock()
+            )
+            assert (
+                client.post("/v1/models/pull", json={"model": "model"}).status_code
+                == 200
+            )
+
+    @pytest.mark.parametrize("value", [None, 42, [], "   "])
+    def test_pull_rejects_invalid_model_type(self, value):
+        client = TestClient(_app(_make_ollama_engine(), engine_name="ollama"))
+        assert client.post("/v1/models/pull", json={"model": value}).status_code == 400
+
     def test_pull_requires_model_field(self):
         engine = _make_ollama_engine()
         client = TestClient(_app(engine, engine_name="ollama"))

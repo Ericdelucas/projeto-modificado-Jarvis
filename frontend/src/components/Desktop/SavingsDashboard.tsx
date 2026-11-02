@@ -501,7 +501,7 @@ export function SavingsDashboard({ apiUrl }: { apiUrl: string }) {
                 cursor: 'pointer',
               }}
             >
-              Cancel
+              Cancelar
             </button>
             {optInEnabled && (
               <button
@@ -556,7 +556,7 @@ export function SavingsDashboard({ apiUrl }: { apiUrl: string }) {
       {/* Stat cards row */}
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
-          <div style={styles.statLabel}>Total Requests</div>
+          <div style={styles.statLabel}>Total de requisições</div>
           <div style={styles.statValue}>
             {(data?.total_calls ?? 0).toLocaleString()}
           </div>
@@ -610,7 +610,7 @@ export function SavingsDashboard({ apiUrl }: { apiUrl: string }) {
       </div>
 
       <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 8, lineHeight: 1.5 }}>
-        *Savings estimates assume local models (e.g. Qwen, Nemotron, Kimi) produce roughly the same number of tokens per request, on average, as closed-source cloud models.
+        *As estimativas de economia pressupõem que modelos locais (Qwen, Nemotron, Kimi etc.) geram, em média, aproximadamente a mesma quantidade de tokens por requisição que os modelos proprietários na nuvem.
       </div>
 
       {/* Cloud Agent Platforms */}

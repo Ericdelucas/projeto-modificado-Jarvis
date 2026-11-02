@@ -6,3 +6,16 @@ export function stripThinkTags(text: string): string {
   cleaned = cleaned.replace(/^[\s\S]*?<\/think>\s*/i, '');
   return cleaned.trim();
 }
+
+/** Prepare prose for neural speech without reading Markdown punctuation. */
+export function cleanSpeechText(text: string): string {
+  return stripThinkTags(text)
+    .replace(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, '')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/^\s*(?:#{1,6}\s+|>\s*|[-+*]\s+|\d+[.)]\s+)/gm, '')
+    .replace(/[*_`~#|]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}

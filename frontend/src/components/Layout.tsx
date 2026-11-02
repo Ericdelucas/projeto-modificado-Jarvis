@@ -11,6 +11,19 @@ export function Layout() {
   const [apiReachable, setApiReachable] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const compact = window.matchMedia('(max-width: 767px)');
+    const fitScreen = () => {
+      if (compact.matches) {
+        useAppStore.getState().setSidebarOpen(false);
+        useAppStore.getState().setSystemPanelOpen(false);
+      }
+    };
+    fitScreen();
+    compact.addEventListener('change', fitScreen);
+    return () => compact.removeEventListener('change', fitScreen);
+  }, []);
+
+  useEffect(() => {
     const check = () => checkHealth().then(setApiReachable);
     check();
     const interval = setInterval(check, 30000);
@@ -44,13 +57,13 @@ export function Layout() {
             className="w-1.5 h-1.5 rounded-full shrink-0"
             style={{ background: 'var(--color-error)' }}
           />
-          <span>Cannot reach OpenJarvis backend</span>
+          <span>Não foi possível conectar ao servidor do OpenJarvis</span>
           <button
             onClick={() => navigate('/settings')}
             className="text-sm underline cursor-pointer ml-auto shrink-0"
             style={{ color: 'var(--color-accent)' }}
           >
-            Change URL
+            Alterar URL
           </button>
         </div>
       )}

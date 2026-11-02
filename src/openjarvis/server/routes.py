@@ -7,12 +7,14 @@ import logging
 import threading
 import uuid
 import weakref
+from contextlib import nullcontext
 from dataclasses import replace
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
+from openjarvis.core.language import DEFAULT_SYSTEM_PROMPT
 from openjarvis.core.paths import get_config_dir
 from openjarvis.core.types import Message, Role, ToolCall
 from openjarvis.server.model_capabilities import is_embed_only_model
@@ -59,7 +61,7 @@ def _to_messages(chat_messages) -> list[Message]:
 
 
 def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message]:
-    """Return one leading system message, adding identity when needed.
+    """Return one leading system message with identity and the pt-BR default.
 
     The desktop UI's chat backend posts only user/assistant turns to
     ``/v1/chat/completions`` (see ``frontend/.../Chat/InputArea.tsx``), so
@@ -71,6 +73,7 @@ def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message
 
     If any caller-supplied message already carries a system role, the caller
     has supplied their own grounding and we do not add the server identity.
+    The global pt-BR instruction is always applied, including caller prompts.
     All system messages are still folded into one leading entry because some
     chat templates reject multiple or mid-history system roles. Internally
     tagged memory context does not count as caller grounding.
@@ -125,6 +128,8 @@ def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message
     if prompt:
         system_parts.append(prompt)
     system_parts.extend(message.text for message in system_messages if message.text)
+    if not any(DEFAULT_SYSTEM_PROMPT in part for part in system_parts):
+        system_parts.append(DEFAULT_SYSTEM_PROMPT)
     non_system_messages = [
         message for message in messages if message.role != Role.SYSTEM
     ]
@@ -148,7 +153,7 @@ def _ensure_identity_prompt(messages: list[Message], app_config) -> list[Message
     else:
         combined_system = Message(
             role=Role.SYSTEM,
-            content=prompt,
+            content="\n\n".join(system_parts),
             metadata={"openjarvis_identity_prompt": True},
         )
 
@@ -161,6 +166,57 @@ async def chat_completions(request_body: ChatCompletionRequest, request: Request
     engine = request.app.state.engine
     agent = getattr(request.app.state, "agent", None)
     model = request_body.model
+    # Programming policy lives entirely in its module; this is only the API hook.
+    from openjarvis.programacao.routing import prepare_route
+
+    query = next(
+        (m.content for m in reversed(request_body.messages)
+         if m.role == "user" and m.content), "",
+    )
+    config = getattr(request.app.state, "config", None)
+    tools = getattr(agent, "_tools", []) if agent is not None else []
+    if not request_body.tools and isinstance(tools, list) and any(
+        getattr(getattr(tool, "spec", None), "name", None) == "gui_control"
+        for tool in tools
+    ):
+        from openjarvis.operators.navigation_intent import resolve_navigation
+
+        history = [m.content for m in request_body.messages[:-1] if m.role == "user"]
+        general_model = getattr(
+            getattr(config, "programacao", None), "general_model", model,
+        )
+        try:
+            request_body._navigation_action = await asyncio.to_thread(
+                resolve_navigation, query, history, engine, general_model,
+            )
+        except ValueError as exc:
+            from openjarvis.programacao.routing import programming_intent
+
+            # A malformed browser decision must not reject a coding request
+            # before the configured specialist gets a chance to handle it.
+            if not programming_intent(query):
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            request_body._navigation_action = None
+        request_body._navigation_resolved = True
+    if request_body._navigation_action is not None:
+        from openjarvis.programacao.routing import ProgrammingRoute
+
+        route = ProgrammingRoute(general_model)
+    else:
+        route = await asyncio.to_thread(
+            prepare_route, query, model, config, engine,
+        )
+    model = request_body.model = route.model
+    if route.programming:
+        # Code specialists may not support tool calling. Keep this isolated
+        # path out of the general system-app/calendar tool loop.
+        agent = None
+    if route.context:
+        from openjarvis.server.models import ChatMessage
+
+        request_body.messages.insert(
+            0, ChatMessage(role="system", content=route.context),
+        )
     use_server_agent = (
         agent is not None
         and not request_body.tools
@@ -610,6 +666,8 @@ def _handle_agent(
 
     # Build context from prior messages
     ctx = AgentContext()
+    if req._navigation_resolved:
+        ctx.metadata["navigation_action"] = req._navigation_action
     if len(req.messages) > 1:
         prior = _to_messages(req.messages[:-1])
         for m in prior:
@@ -622,9 +680,11 @@ def _handle_agent(
     # Locked for the full override-run-restore cycle (#759): only the
     # override/restore lines racing wouldn't be enough, since agent.run()
     # itself reads self._model throughout the call.
-    with _get_agent_model_lock(agent):
+    navigation = ctx.metadata.get("navigation_action") or {}
+    emergency = navigation.get("action") in {"stop", "resume"}
+    with (nullcontext() if emergency else _get_agent_model_lock(agent)):
         original_model = agent._model
-        if model:
+        if model and not emergency:
             agent._model = model
         try:
             if trace_store is not None:
@@ -635,7 +695,8 @@ def _handle_agent(
             else:
                 result = agent.run(input_text, context=ctx)
         finally:
-            agent._model = original_model
+            if not emergency:
+                agent._model = original_model
 
     usage = UsageInfo(
         prompt_tokens=result.metadata.get("prompt_tokens", 0),
@@ -1147,18 +1208,42 @@ async def list_models(request: Request) -> ModelListResponse:
     )
 
 
+def _find_ollama_engine(engine):
+    """Find Ollama through routing/instrumentation, not the wrapper's label."""
+    pending = [engine]
+    seen = set()
+    while pending:
+        current = pending.pop()
+        if current is None or id(current) in seen:
+            continue
+        seen.add(id(current))
+        kind = getattr(current, "engine_id", None)
+        if kind == "ollama":
+            return current
+        if kind == "instrumented":
+            pending.append(getattr(current, "_inner", None))
+        elif kind == "multi":
+            entries = getattr(current, "_engines", ())
+            if isinstance(entries, (list, tuple)):
+                pending.extend(child for _, child in entries)
+    return None
+
+
 @router.post("/v1/models/pull")
 async def pull_model(request: Request):
     """Pull / download a model from the Ollama registry."""
     body = await request.json()
-    model_name = body.get("model", "").strip()
-    if not model_name:
+    model_name = body.get("model") if isinstance(body, dict) else None
+    if not isinstance(model_name, str) or not model_name.strip():
         raise HTTPException(status_code=400, detail="'model' field is required")
+    model_name = model_name.strip()
 
     engine = request.app.state.engine
     engine_name = getattr(request.app.state, "engine_name", "")
-    # Only Ollama supports pulling
-    if engine_name != "ollama" and getattr(engine, "engine_id", "") != "ollama":
+    ollama = _find_ollama_engine(engine)
+    if ollama is None and engine_name == "ollama":
+        ollama = engine  # Compatibility with externally supplied Ollama adapters.
+    if ollama is None:
         raise HTTPException(
             status_code=501,
             detail="Model pulling is only supported with the Ollama engine",
@@ -1166,7 +1251,11 @@ async def pull_model(request: Request):
 
     import httpx as _httpx
 
-    host = getattr(engine, "_host", "http://localhost:11434")
+    host = getattr(ollama, "_host", None)
+    if not isinstance(host, str) or not host:
+        config = getattr(request.app.state, "config", None)
+        host = getattr(getattr(getattr(config, "engine", None), "ollama", None),
+                       "host", "http://localhost:11434")
     try:
         async with _httpx.AsyncClient(base_url=host, timeout=600.0) as client:
             resp = await client.post(
@@ -1182,7 +1271,35 @@ async def pull_model(request: Request):
             detail=f"Ollama error: {exc.response.text[:300]}",
         )
 
+    # Refresh MultiEngine's model map so subsequent inference can use the model.
+    try:
+        await asyncio.to_thread(engine.list_models)
+    except Exception:
+        logging.getLogger("openjarvis.server").warning(
+            "Model downloaded, but refreshing the model list failed", exc_info=True,
+        )
     return {"status": "ok", "model": model_name}
+
+
+@router.get("/api/automation/status")
+async def automation_status():
+    from openjarvis.operators.gui_operator import get_gui_operator, wayland
+
+    operator = get_gui_operator()
+    return {"stopped": operator.stopped.is_set(), "reason": operator.stop_reason,
+            "desktop_input_supported": not wayland()}
+
+
+@router.post("/api/automation/resume")
+async def automation_resume():
+    from openjarvis.operators.gui_operator import GuiControlTool
+
+    result = await asyncio.to_thread(GuiControlTool().execute, action="resume")
+    if not result.success:
+        import json
+
+        raise HTTPException(409, json.loads(result.content)["message"])
+    return {"stopped": False}
 
 
 @router.delete("/v1/models/{model_name:path}")
@@ -1383,6 +1500,41 @@ async def server_info(request: Request):
         "agent": agent_id,
         "engine": getattr(request.app.state, "engine_name", ""),
     }
+
+
+def _gpu_load() -> dict | None:
+    """First NVIDIA GPU's name and utilization, or None without nvidia-smi."""
+    import shutil
+    import subprocess
+
+    smi = shutil.which("nvidia-smi")
+    if smi is None:
+        return None
+    try:
+        out = subprocess.run(
+            [
+                smi,
+                "--query-gpu=name,utilization.gpu",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=True,
+        ).stdout
+        name, percent = out.splitlines()[0].rsplit(",", 1)
+        return {"name": name.strip(), "percent": float(percent)}
+    except (OSError, subprocess.SubprocessError, ValueError, IndexError):
+        return None
+
+
+@router.get("/v1/system/load")
+async def system_load():
+    """Current CPU and GPU utilization for the HUD status bar."""
+    import psutil
+
+    gpu = await asyncio.to_thread(_gpu_load)
+    return {"cpu_percent": psutil.cpu_percent(interval=None), "gpu": gpu}
 
 
 @router.get("/health")
